@@ -7,6 +7,7 @@ import red_social_academica.red_social_academica.repository.PostRepository;
 import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.service.IPostService;
 import red_social_academica.red_social_academica.validation.PostValidator;
+import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -34,6 +35,8 @@ public class PostServiceImpl implements IPostService {
         this.userRepository = userRepository;
     }
 
+    // === CREAR ===
+
     @Override
     @Transactional
     public PostDTO crearPost(String username, PostCreateDTO dto) {
@@ -45,33 +48,89 @@ public class PostServiceImpl implements IPostService {
         return convertToDTO(postRepository.save(post));
     }
 
+    // === ACTUALIZAR PUBLICO ===
+
     @Override
     @Transactional
-    public PostDTO actualizarPost(Long postId, PostUpdateDTO dto) {
-        postValidator.validarActualizacion(dto);
+    public PostDTO actualizarPostPropio(Long postId, PostUpdateDTO dto) {
+        String actual = getCurrentUsername();
         Post post = postRepository.findByIdAndActivoTrue(postId)
                 .orElseThrow(() -> new RuntimeException("Publicacion no encontrada o inactiva"));
 
+        if (!post.getUser().getUsername().equals(actual)) {
+            throw new SecurityException("No puedes modificar publicaciones de otros usuarios");
+        }
+
+        postValidator.validarActualizacion(dto);
         updateEntityFromUpdateDTO(dto, post);
         post.setFechaModificacion(LocalDate.now());
-        post.setUsuarioModificacion("admin");
+        post.setUsuarioModificacion(actual);
 
         return convertToDTO(postRepository.save(post));
     }
+
+    // === ACTUALIZAR ADMIN ===
 
     @Override
     @Transactional
-    public PostDTO eliminarPost(Long postId, String motivoBaja) {
-        Post post = postRepository.findByIdAndActivoTrue(postId)
-                .orElseThrow(() -> new RuntimeException("Publicacion no encontrada o ya eliminada"));
+    public PostDTO actualizarPostComoAdmin(Long postId, PostUpdateDTO dto) {
+        if (!isAdmin()) {
+            throw new SecurityException("Solo administradores pueden editar cualquier post");
+        }
 
-        post.setActivo(false);
-        post.setFechaBaja(LocalDate.now());
-        post.setUsuarioBaja("admin");
-        post.setMotivoBaja(motivoBaja);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post no encontrado"));
+
+        postValidator.validarActualizacion(dto);
+        updateEntityFromUpdateDTO(dto, post);
+        post.setFechaModificacion(LocalDate.now());
+        post.setUsuarioModificacion(getCurrentUsername());
 
         return convertToDTO(postRepository.save(post));
     }
+
+    // === ELIMINAR PUBLICO ===
+
+    @Override
+    @Transactional
+    public PostDTO eliminarPostPropio(Long postId, String motivo) {
+        String actual = getCurrentUsername();
+        Post post = postRepository.findByIdAndActivoTrue(postId)
+                .orElseThrow(() -> new RuntimeException("Publicacion no encontrada o ya eliminada"));
+
+        if (!post.getUser().getUsername().equals(actual)) {
+            throw new SecurityException("No puedes eliminar publicaciones de otros usuarios");
+        }
+
+        post.setActivo(false);
+        post.setFechaBaja(LocalDate.now());
+        post.setUsuarioBaja(actual);
+        post.setMotivoBaja(motivo);
+
+        return convertToDTO(postRepository.save(post));
+    }
+
+    // === ELIMINAR ADMIN ===
+
+    @Override
+    @Transactional
+    public PostDTO eliminarPostComoAdmin(Long postId, String motivo) {
+        if (!isAdmin()) {
+            throw new SecurityException("Solo administradores pueden eliminar cualquier post");
+        }
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Publicación no encontrada"));
+
+        post.setActivo(false);
+        post.setFechaBaja(LocalDate.now());
+        post.setUsuarioBaja(getCurrentUsername());
+        post.setMotivoBaja(motivo);
+
+        return convertToDTO(postRepository.save(post));
+    }
+
+    // === CONSULTAS ===
 
     @Override
     public PostDTO obtenerPorId(Long postId) {
@@ -99,7 +158,7 @@ public class PostServiceImpl implements IPostService {
                 .toList();
     }
 
-    // --------- Mapeos ---------
+    // === MAPEOS ===
 
     private PostDTO convertToDTO(Post post) {
         String fullName = post.getUser().getName() + " " + post.getUser().getLastName();

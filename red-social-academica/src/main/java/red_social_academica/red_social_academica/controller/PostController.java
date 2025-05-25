@@ -16,10 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import static red_social_academica.red_social_academica.auth.security.AuthUtils.getCurrentUsername;
 
 @RestController
 @RequestMapping("/api/posts")
-@Tag(name = "Publicaciones", description = "Operaciones sobre publicaciones académicas")
+@Tag(name = "Publicaciones", description = "Operaciones públicas sobre publicaciones académicas")
 public class PostController {
 
     private final IPostService postService;
@@ -29,35 +30,34 @@ public class PostController {
         this.postService = postService;
     }
 
-    @Operation(summary = "Crear una nueva publicación")
-    @ApiResponse(responseCode = "201", description = "Publicación creada exitosamente")
-    @PostMapping("/{username}")
+    @Operation(summary = "Crear una nueva publicación (usuario autenticado)")
+    @PostMapping
     public ResponseEntity<PostDTO> crearPost(
-            @PathVariable String username,
             @Valid @RequestBody PostCreateDTO postCreateDTO) {
+        String username = getCurrentUsername();
         PostDTO nueva = postService.crearPost(username, postCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
 
-    @Operation(summary = "Actualizar una publicación")
+    @Operation(summary = "Actualizar una publicación propia")
     @PutMapping("/{postId}")
     public ResponseEntity<PostDTO> actualizarPost(
             @PathVariable Long postId,
             @Valid @RequestBody PostUpdateDTO postUpdateDTO) {
-        PostDTO actualizada = postService.actualizarPost(postId, postUpdateDTO);
+        PostDTO actualizada = postService.actualizarPostPropio(postId, postUpdateDTO);
         return ResponseEntity.ok(actualizada);
     }
 
-    @Operation(summary = "Eliminar lógicamente una publicación")
-    @PutMapping("/{postId}/baja")
+    @Operation(summary = "Eliminar lógicamente una publicación propia")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<PostDTO> eliminarPost(
             @PathVariable Long postId,
             @RequestParam String motivo) {
-        PostDTO eliminada = postService.eliminarPost(postId, motivo);
+        PostDTO eliminada = postService.eliminarPostPropio(postId, motivo);
         return ResponseEntity.ok(eliminada);
     }
 
-    @Operation(summary = "Obtener detalles de una publicación activa")
+    @Operation(summary = "Obtener detalles de una publicación activa por ID")
     @GetMapping("/{postId}")
     public ResponseEntity<PostDTO> obtenerPostPorId(@PathVariable Long postId) {
         return ResponseEntity.ok(postService.obtenerPorId(postId));
@@ -73,7 +73,7 @@ public class PostController {
         return ResponseEntity.ok(postService.obtenerPostsDeUsuario(username, pageable));
     }
 
-    @Operation(summary = "Buscar publicaciones activas por texto")
+    @Operation(summary = "Buscar publicaciones activas por texto en título o contenido")
     @GetMapping("/buscar")
     public ResponseEntity<Page<PostDTO>> buscarPorTexto(
             @RequestParam String texto,
@@ -83,7 +83,7 @@ public class PostController {
         return ResponseEntity.ok(postService.buscarPostsPorTexto(texto, pageable));
     }
 
-    @Operation(summary = "Obtener las 10 publicaciones más recientes")
+    @Operation(summary = "Obtener las 10 publicaciones activas más recientes")
     @GetMapping("/recientes")
     public ResponseEntity<List<PostDTO>> obtenerTop10Recientes() {
         return ResponseEntity.ok(postService.obtenerTop10PublicacionesRecientes());
