@@ -34,7 +34,7 @@ public class CommentServiceImpl implements ICommentService {
     private CommentValidator commentValidator;
 
     public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository,
-            UserRepository userRepository, CommentValidator commentValidator) {
+                               UserRepository userRepository, CommentValidator commentValidator) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
@@ -53,25 +53,66 @@ public class CommentServiceImpl implements ICommentService {
                 .orElseThrow(() -> new RuntimeException("Publicacion no encontrada o inactiva"));
 
         Comment comment = mapFromCreateDTO(dto, author, post);
-
         return convertToDTO(commentRepository.save(comment));
     }
 
     @Override
     @Transactional
-    public CommentDTO actualizarComentario(Long commentId, String username, CommentUpdateDTO dto) {
+    public CommentDTO actualizarComentarioPropio(Long commentId, CommentUpdateDTO dto) {
+        String actual = getCurrentUsername();
+
         Comment comment = commentRepository.findByIdAndActivoTrue(commentId)
                 .orElseThrow(() -> new RuntimeException("Comentario no encontrado o inactivo"));
 
-        boolean esAdmin = isAdmin();
-        if (!esAdmin && !comment.getAuthor().getUsername().equals(username)) {
+        if (!comment.getAuthor().getUsername().equals(actual)) {
             throw new SecurityException("No puedes editar este comentario");
         }
 
-        updateEntityFromUpdateDTO(dto, comment);
-        comment.setFechaModificacion(LocalDate.now());
-        comment.setUsuarioModificacion(username);
+        updateEntityFromUpdateDTO(dto, comment, actual);
+        return convertToDTO(commentRepository.save(comment));
+    }
 
+    @Override
+    @Transactional
+    public CommentDTO actualizarComentarioComoAdmin(Long commentId, CommentUpdateDTO dto) {
+        if (!isAdmin()) {
+            throw new SecurityException("Acceso restringido a administradores");
+        }
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+
+        updateEntityFromUpdateDTO(dto, comment, getCurrentUsername());
+        return convertToDTO(commentRepository.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public CommentDTO eliminarComentarioPropio(Long commentId, String motivoBaja) {
+        String actual = getCurrentUsername();
+
+        Comment comment = commentRepository.findByIdAndActivoTrue(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado o ya eliminado"));
+
+        if (!comment.getAuthor().getUsername().equals(actual)) {
+            throw new SecurityException("No puedes eliminar este comentario");
+        }
+
+        marcarComoEliminado(comment, actual, motivoBaja);
+        return convertToDTO(commentRepository.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public CommentDTO eliminarComentarioComoAdmin(Long commentId, String motivoBaja) {
+        if (!isAdmin()) {
+            throw new SecurityException("Solo administradores pueden eliminar comentarios ajenos");
+        }
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comentario no encontrado"));
+
+        marcarComoEliminado(comment, getCurrentUsername(), motivoBaja);
         return convertToDTO(commentRepository.save(comment));
     }
 
@@ -95,28 +136,7 @@ public class CommentServiceImpl implements ICommentService {
                 .map(this::convertToDTO);
     }
 
-    @Override
-    @Transactional
-    public CommentDTO eliminarComentario(Long commentId, String motivoBaja, String username, String role) {
-        Comment comment = commentRepository.findByIdAndActivoTrue(commentId)
-                .orElseThrow(() -> new RuntimeException("Comentario no encontrado o ya eliminado"));
-
-        boolean esAdmin = "ROLE_ADMIN".equalsIgnoreCase(role);
-        boolean esAutor = comment.getAuthor().getUsername().equals(username);
-
-        if (!esAdmin && !esAutor) {
-            throw new SecurityException("No tienes permisos para eliminar este comentario");
-        }
-
-        comment.setActivo(false);
-        comment.setFechaBaja(LocalDate.now());
-        comment.setUsuarioBaja(username);
-        comment.setMotivoBaja(motivoBaja);
-
-        return convertToDTO(commentRepository.save(comment));
-    }
-
-    // --------- Mapeos ---------
+    // ---------- MAPEOS ----------
 
     private CommentDTO convertToDTO(Comment comment) {
         String fullName = comment.getAuthor().getName() + " " + comment.getAuthor().getLastName();
@@ -134,7 +154,6 @@ public class CommentServiceImpl implements ICommentService {
                 .activo(comment.isActivo())
                 .build();
     }
-    // --------- Mapeos DTO a Entidad ---------
 
     private Comment mapFromCreateDTO(CommentCreateDTO dto, User author, Post post) {
         return Comment.builder()
@@ -148,10 +167,24 @@ public class CommentServiceImpl implements ICommentService {
                 .build();
     }
 
-    private void updateEntityFromUpdateDTO(CommentUpdateDTO dto, Comment comment) {
+    private void updateEntityFromUpdateDTO(CommentUpdateDTO dto, Comment comment, String username) {
         comment.setContent(dto.getContent());
         comment.setFechaModificacion(LocalDate.now());
-        comment.setUsuarioModificacion("admin");
+        comment.setUsuarioModificacion(username);
+    }
+
+    private void marcarComoEliminado(Comment comment, String usuario, String motivo) {
+        comment.setActivo(false);
+        comment.setFechaBaja(LocalDate.now());
+        comment.setUsuarioBaja(usuario);
+        comment.setMotivoBaja(motivo);
+    }
+
+    // ---------- Seguridad ----------
+
+    private String getCurrentUsername() {
+        return org.springframework.security.core.context.SecurityContextHolder.getContext()
+                .getAuthentication().getName();
     }
 
     private boolean isAdmin() {
@@ -159,5 +192,4 @@ public class CommentServiceImpl implements ICommentService {
                 .getAuthentication().getAuthorities()
                 .stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
-
 }

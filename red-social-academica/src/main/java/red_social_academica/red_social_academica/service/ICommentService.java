@@ -45,23 +45,36 @@ public interface ICommentService {
     // === Actualizar ===
 
     /**
-     * Actualiza el contenido de un comentario si es del autor o el usuario es admin.
+     * Actualiza un comentario propio del usuario autenticado.
      * @param commentId ID del comentario
-     * @param username usuario solicitante
      * @param commentUpdateDTO contenido actualizado
-     * @return Comentario actualizado
+     * @return DTO actualizado
      */
-    CommentDTO actualizarComentario(Long commentId, String username, CommentUpdateDTO commentUpdateDTO);
+    CommentDTO actualizarComentarioPropio(Long commentId, CommentUpdateDTO commentUpdateDTO);
+
+    /**
+     * Actualiza un comentario como administrador.
+     * @param commentId ID del comentario
+     * @param commentUpdateDTO contenido actualizado
+     * @return DTO actualizado
+     */
+    CommentDTO actualizarComentarioComoAdmin(Long commentId, CommentUpdateDTO commentUpdateDTO);
 
     // === Eliminar ===
 
     /**
-     * Elimina lógicamente un comentario (auditoría).
-     * @param commentId ID del comentario a eliminar
-     * @param motivoBaja razón de eliminación
-     * @param username nombre del usuarioq ue esta eliminando
-     * @param role role del usuario que esta eliminando
-     * @return Comentario eliminado
+     * Elimina lógicamente un comentario propio (público).
+     * @param commentId ID del comentario
+     * @param motivoBaja motivo de eliminación
+     * @return DTO eliminado
      */
-    CommentDTO eliminarComentario(Long commentId, String motivoBaja, String username, String role);
+    CommentDTO eliminarComentarioPropio(Long commentId, String motivoBaja);
+
+    /**
+     * Elimina lógicamente un comentario como administrador.
+     * @param commentId ID del comentario
+     * @param motivoBaja motivo de eliminación
+     * @return DTO eliminado
+     */
+    CommentDTO eliminarComentarioComoAdmin(Long commentId, String motivoBaja);
 }
