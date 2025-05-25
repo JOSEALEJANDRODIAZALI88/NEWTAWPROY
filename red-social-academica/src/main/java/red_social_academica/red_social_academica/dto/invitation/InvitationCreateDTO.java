@@ -15,15 +15,12 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "DTO para enviar una invitación de amistad")
+@Schema(description = "DTO para enviar una invitacion de amistad")
 public class InvitationCreateDTO implements Serializable {
 
-    @Schema(description = "ID del usuario al que se desea enviar la invitación", example = "42")
-    private Long receiverId;
-
-    @Schema(description = "Username del usuario al que se desea enviar la invitación", example = "ana_gomez")
+    @Schema(description = "Username del usuario al que se desea enviar la invitacion", example = "ana_gomez")
     @NotBlank(message = "El username del destinatario es obligatorio")
     @Size(min = 3, max = 30, message = "El username debe tener entre 3 y 30 caracteres")
     private String receiverUsername;
-
 }
+

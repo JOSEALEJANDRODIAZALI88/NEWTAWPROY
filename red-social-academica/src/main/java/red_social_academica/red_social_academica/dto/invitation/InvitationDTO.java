@@ -16,36 +16,36 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "DTO para representar una invitación de amistad")
+@Schema(description = "DTO para representar una invitacion de amistad")
 public class InvitationDTO implements Serializable {
 
-    @Schema(description = "ID único de la invitación", example = "200", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "ID unico de la invitacion", example = "200", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
-    @Schema(description = "ID del usuario que envía la invitación", example = "10")
+    @Schema(description = "ID del usuario que envia la invitacion", example = "10")
     private Long senderId;
 
-    @Schema(description = "Nombre del remitente", example = "Carlos Ramírez")
+    @Schema(description = "Nombre del remitente", example = "Carlos Ramirez")
     private String senderName;
 
-    @Schema(description = "ID del usuario que recibe la invitación", example = "25")
+    @Schema(description = "ID del usuario que recibe la invitacion", example = "25")
     private Long receiverId;
 
-    @Schema(description = "Nombre del destinatario", example = "Ana Gómez")
+    @Schema(description = "Nombre del destinatario", example = "Ana Gomez")
     private String receiverName;
 
-    @Schema(description = "Fecha de creación de la invitación", example = "2025-05-22", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Fecha de creacion de la invitacion", example = "2025-05-22", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaAlta;
 
-    @Schema(description = "Fecha de la última modificación de la invitación", example = "2025-05-24", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Fecha de la ultima modificacion de la invitacion", example = "2025-05-24", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaModificacion;
 
-    @Schema(description = "Motivo de cancelación o rechazo de la invitación", example = "rechazada por el destinatario", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Motivo de cancelacion o rechazo de la invitacion", example = "rechazada por el destinatario", accessMode = Schema.AccessMode.READ_ONLY)
     private String motivoBaja;
 
-    @Schema(description = "Fecha de cancelación o eliminación de la invitación", example = "2025-05-25", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Fecha de cancelacion o eliminacion de la invitacion", example = "2025-05-25", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaBaja;
 
-    @Schema(description = "Indica si la publicacion esta activa", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "Indica si la invitacion esta activa", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
     private boolean activo;
 }

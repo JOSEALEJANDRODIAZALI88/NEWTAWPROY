@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {"sender", "receiver"})
-public class Invitation extends AuditableEntity{
+public class Invitation extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +32,10 @@ public class Invitation extends AuditableEntity{
 
     @ManyToOne(optional = false)
     private User sender;
+
+    @Column(name = "activo", nullable = false)
+    @Builder.Default
+    private boolean activo = true;
 
     public Invitation(User sender, User receiver) {
         this.sender = sender;
@@ -54,7 +58,7 @@ public class Invitation extends AuditableEntity{
         this.receiver = null;
     }
 
-    public boolean esDelUsuario(String email) {
-        return sender.getEmail().equals(email) || receiver.getEmail().equals(email);
+    public boolean esDelUsuario(String username) {
+        return sender.getUsername().equals(username) || receiver.getUsername().equals(username);
     }
 }

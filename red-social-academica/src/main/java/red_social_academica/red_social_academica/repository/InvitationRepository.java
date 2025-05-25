@@ -5,16 +5,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InvitationRepository extends JpaRepository<Invitation, Long> {
 
-    // Invitaciones enviadas por username
-    List<Invitation> findBySenderUsername(String username);
+    // === Invitaciones activas o no enviadas por un usuario (admin)===
+    List<Invitation> findAllByActivoTrue();
 
-    // Invitaciones recibidas por username
-    List<Invitation> findByReceiverUsername(String username);
+    // === Invitaciones activas enviadas por un usuario ===
+    List<Invitation> findBySenderUsernameAndActivoTrue(String username);
 
-    // Verificar si ya existe una invitación entre dos usuarios
-    boolean existsBySenderUsernameAndReceiverUsername(String sender, String receiver);
+    // === Invitaciones activas recibidas por un usuario ===
+    List<Invitation> findByReceiverUsernameAndActivoTrue(String username);
+
+    // === Buscar invitacion activa entre dos usuarios ===
+    Optional<Invitation> findBySenderUsernameAndReceiverUsernameAndActivoTrue(String sender, String receiver);
+
+    // === Verifica si ya existe una invitacion activa entre dos usuarios ===
+    boolean existsBySenderUsernameAndReceiverUsernameAndActivoTrue(String sender, String receiver);
+
 }
