@@ -2,6 +2,7 @@ package red_social_academica.red_social_academica.controller;
 
 import red_social_academica.red_social_academica.dto.user.*;
 import red_social_academica.red_social_academica.service.IUserService;
+import static red_social_academica.red_social_academica.auth.security.AuthUtils.getCurrentUsername;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@Tag(name = "Usuarios", description = "Operaciones para la gestión de usuarios")
+@Tag(name = "Usuarios", description = "Operaciones para usuarios autenticados")
 public class UserController {
 
     private final IUserService userService;
@@ -44,69 +45,53 @@ public class UserController {
     }
 
     @Operation(summary = "Actualizar perfil del usuario autenticado")
-    @PutMapping("/{username}")
+    @PutMapping("/me")
     public ResponseEntity<UserDTO> actualizarPerfil(
-            @PathVariable String username,
             @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
-        logger.info("[USUARIO] Actualizando perfil de: {}", username);
-        UserDTO actualizado = userService.actualizarPerfil(username, userUpdateDTO);
+        logger.info("[USUARIO] Actualizando perfil propio");
+        UserDTO actualizado = userService.actualizarPerfil(userUpdateDTO);
         return ResponseEntity.ok(actualizado);
     }
 
-    @Operation(summary = "Obtener perfil de un usuario")
-    @GetMapping("/{username}")
-    public ResponseEntity<UserDTO> obtenerPorUsername(@PathVariable String username) {
-        logger.info("[USUARIO] Consultando perfil de: {}", username);
+    @Operation(summary = "Obtener mi perfil")
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> obtenerMiPerfil() {
+        String username = getCurrentUsername();
         UserDTO usuario = userService.obtenerPorUsername(username);
         return ResponseEntity.ok(usuario);
     }
 
-    @Operation(summary = "Eliminar lógicamente un usuario")
-    @PutMapping("/{username}/baja")
-    public ResponseEntity<UserDTO> eliminarUsuario(@PathVariable String username) {
-        logger.info("[USUARIO] Dando de baja usuario: {}", username);
-        UserDTO eliminado = userService.eliminarUsuario(username);
+    @Operation(summary = "Eliminar lógicamente mi cuenta")
+    @PutMapping("/me/baja")
+    public ResponseEntity<UserDTO> eliminarUsuario() {
+        logger.info("[USUARIO] Eliminando su propia cuenta");
+        UserDTO eliminado = userService.eliminarUsuario();
         return ResponseEntity.ok(eliminado);
     }
 
-    @Operation(summary = "Listar usuarios por rol")
-    @GetMapping("/rol/{role}")
-    public ResponseEntity<Page<UserDTO>> obtenerPorRol(
-            @PathVariable String role,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> usuarios = userService.obtenerPorRol(role, pageable);
-        return ResponseEntity.ok(usuarios);
+    @Operation(summary = "Ver perfil público de otro usuario")
+    @GetMapping("/{username}")
+    public ResponseEntity<UserDTO> obtenerPorUsername(@PathVariable String username) {
+        logger.info("[USUARIO] Consultando perfil público de: {}", username);
+        UserDTO usuario = userService.obtenerPorUsername(username);
+        return ResponseEntity.ok(usuario);
     }
 
-    @Operation(summary = "Buscar usuarios por nombre o email")
-    @GetMapping("/buscar")
-    public ResponseEntity<Page<UserDTO>> buscarPorNombreYCorreo(
-            @RequestParam String texto,
-            @RequestParam String role,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> resultado = userService.buscarPorNombreYCorreo(texto, role, pageable);
-        return ResponseEntity.ok(resultado);
-    }
-
-    @Operation(summary = "Obtener lista de amigos de un usuario")
-    @GetMapping("/{username}/amigos")
-    public ResponseEntity<List<UserDTO>> obtenerAmigos(@PathVariable String username) {
-        List<UserDTO> amigos = userService.obtenerAmigos(username);
+    @Operation(summary = "Obtener lista de amigos del usuario")
+    @GetMapping("/me/amigos")
+    public ResponseEntity<List<UserDTO>> obtenerAmigos() {
+        List<UserDTO> amigos = userService.obtenerAmigos(getCurrentUsername());
         return ResponseEntity.ok(amigos);
     }
 
     @Operation(summary = "Obtener lista paginada de amigos")
-    @GetMapping("/{username}/amigos/page")
+    @GetMapping("/me/amigos/page")
     public ResponseEntity<Page<UserDTO>> obtenerAmigosPaginados(
-            @PathVariable String username,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> amigos = userService.obtenerAmigos(username, pageable);
+        Page<UserDTO> amigos = userService.obtenerAmigos(getCurrentUsername(), pageable);
         return ResponseEntity.ok(amigos);
     }
 }
+

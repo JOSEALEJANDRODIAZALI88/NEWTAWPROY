@@ -5,6 +5,7 @@ import red_social_academica.red_social_academica.model.User;
 import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.service.IUserService;
 import red_social_academica.red_social_academica.validation.UserValidator;
+import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+// IMPORTACIONES OMITIDAS PARA BREVEDAD
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -37,23 +40,78 @@ public class UserServiceImpl implements IUserService {
 
         User user = mapFromCreateDTO(dto);
         user.setFechaAlta(LocalDate.now());
-        user.setUsuarioAlta("admin");
+        user.setUsuarioAlta(getCurrentUsername());
         user.setActivo(true);
 
         return convertToDTO(userRepository.save(user));
     }
 
+    // === PUBLIC ===
+
     @Override
-    public UserDTO actualizarPerfil(String username, UserUpdateDTO dto) {
+    public UserDTO actualizarPerfil(UserUpdateDTO dto) {
+        String usernameActual = getCurrentUsername();
+
+        User user = userRepository.findByUsernameAndActivoTrue(usernameActual)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado o inactivo"));
+
+        updateEntityFromUpdateDTO(dto, user);
+        user.setFechaModificacion(LocalDate.now());
+        user.setUsuarioModificacion(usernameActual);
+
+        return convertToDTO(userRepository.save(user));
+    }
+
+    @Override
+    public UserDTO eliminarUsuario() {
+        String usernameActual = getCurrentUsername();
+        User user = userRepository.findByUsernameAndActivoTrue(usernameActual)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado o ya eliminado"));
+
+        user.setActivo(false);
+        user.setFechaBaja(LocalDate.now());
+        user.setUsuarioBaja(usernameActual);
+        user.setMotivoBaja("solicitud del usuario");
+
+        return convertToDTO(userRepository.save(user));
+    }
+
+    // === ADMIN ===
+
+    @Override
+    public UserDTO actualizarUsuarioComoAdmin(String username, UserUpdateDTO dto) {
+        if (!isAdmin()) {
+            throw new SecurityException("Solo los administradores pueden usar esta función");
+        }
+
         User user = userRepository.findByUsernameAndActivoTrue(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado o inactivo"));
 
         updateEntityFromUpdateDTO(dto, user);
         user.setFechaModificacion(LocalDate.now());
-        user.setUsuarioModificacion("admin");
+        user.setUsuarioModificacion(getCurrentUsername());
 
         return convertToDTO(userRepository.save(user));
     }
+
+    @Override
+    public UserDTO eliminarUsuarioComoAdmin(String username) {
+        if (!isAdmin()) {
+            throw new SecurityException("Solo los administradores pueden usar esta función");
+        }
+
+        User user = userRepository.findByUsernameAndActivoTrue(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado o ya eliminado"));
+
+        user.setActivo(false);
+        user.setFechaBaja(LocalDate.now());
+        user.setUsuarioBaja(getCurrentUsername());
+        user.setMotivoBaja("eliminado por administrador");
+
+        return convertToDTO(userRepository.save(user));
+    }
+
+    // === LECTURA ===
 
     @Override
     public UserDTO obtenerPorUsername(String username) {
@@ -88,19 +146,6 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserDTO eliminarUsuario(String username) {
-        User user = userRepository.findByUsernameAndActivoTrue(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado o ya eliminado"));
-
-        user.setActivo(false);
-        user.setFechaBaja(LocalDate.now());
-        user.setUsuarioBaja("admin");
-        user.setMotivoBaja("solicitud del usuario");
-
-        return convertToDTO(userRepository.save(user));
-    }
-
-    @Override
     public boolean existePorUsername(String username) {
         return userRepository.findByUsernameAndActivoTrue(username).isPresent();
     }
@@ -110,7 +155,7 @@ public class UserServiceImpl implements IUserService {
         return userRepository.findByEmailAndActivoTrue(email).isPresent();
     }
 
-    // --------- Mapeos ---------
+    // === MAPEOS ===
 
     private UserDTO convertToDTO(User user) {
         return UserDTO.builder()
@@ -150,5 +195,5 @@ public class UserServiceImpl implements IUserService {
         user.setBio(dto.getBio());
         user.setCareer(dto.getCareer());
         user.setProfilePictureUrl(dto.getProfilePictureUrl());
-    }
+    }  
 }

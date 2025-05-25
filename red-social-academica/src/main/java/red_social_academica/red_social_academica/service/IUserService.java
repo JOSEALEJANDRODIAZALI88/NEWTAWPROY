@@ -11,7 +11,10 @@ import org.springframework.data.domain.Pageable;
  * Interfaz para la gestión de usuarios en la red social académica.
  * Define las operaciones principales de acceso, modificación y búsqueda de perfiles.
  */
+
 public interface IUserService {
+
+    // === Creación ===
 
     /**
      * Registra un nuevo usuario.
@@ -20,13 +23,7 @@ public interface IUserService {
      */
     UserDTO crearUsuario(UserCreateDTO userCreateDTO);
 
-    /**
-     * Actualiza el perfil del usuario autenticado.
-     * @param username nombre de usuario (clave).
-     * @param userUpdateDTO nuevos datos del perfil.
-     * @return Usuario actualizado.
-     */
-    UserDTO actualizarPerfil(String username, UserUpdateDTO userUpdateDTO);
+    // === Lectura ===
 
     /**
      * Devuelve los datos de perfil de un usuario por username.
@@ -67,12 +64,41 @@ public interface IUserService {
      */
     Page<UserDTO> obtenerAmigos(String username, Pageable pageable);
 
+    // === Actualización (público) ===
+
     /**
-     * Elimina un usuario y sus relaciones de amistad.
+     * Actualiza el perfil del usuario autenticado.
+     * @param userUpdateDTO nuevos datos del perfil.
+     * @return Usuario actualizado.
+     */
+    UserDTO actualizarPerfil(UserUpdateDTO userUpdateDTO);
+
+    // === Actualización (admin) ===
+
+    /**
+     * Actualiza el perfil de un usuario como administrador.
+     * @param username nombre de usuario a actualizar.
+     * @param userUpdateDTO nuevos datos del perfil.
+     * @return Usuario actualizado.
+     */
+    UserDTO actualizarUsuarioComoAdmin(String username, UserUpdateDTO userUpdateDTO);
+
+    // === Eliminación lógica ===
+
+    /**
+     * Elimina (desactiva) al usuario autenticado.
+     * @return DTO del usuario eliminado.
+     */
+    UserDTO eliminarUsuario();
+
+    /**
+     * Elimina (desactiva) un usuario como administrador.
      * @param username nombre de usuario a eliminar.
      * @return DTO del usuario eliminado.
      */
-    UserDTO eliminarUsuario(String username);
+    UserDTO eliminarUsuarioComoAdmin(String username);
+
+    // === Verificación ===
 
     /**
      * Verifica si un usuario existe por su username.
@@ -87,4 +113,4 @@ public interface IUserService {
      * @return true si existe
      */
     boolean existePorEmail(String email);
-}   
+}
