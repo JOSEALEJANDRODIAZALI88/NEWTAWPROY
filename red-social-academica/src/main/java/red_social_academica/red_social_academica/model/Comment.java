@@ -1,4 +1,4 @@
-package main.java.red_social_academica.red_social_academica.model;
+package red_social_academica.red_social_academica.model;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package main.java.red_social_academica.model;
+package red_social_academica.red_social_academica.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,7 +34,7 @@ public class Invitation {
     public Invitation(User sender, User receiver) {
         this.sender = sender;
         this.receiver = receiver;
-        sender.getSendInvitations().add(this);
+        sender.getSendedInvitations().add(this);
         receiver.getReceivedInvitations().add(this);
     }
 
@@ -46,7 +46,7 @@ public class Invitation {
     }
 
     public void unlink() {
-        sender.getSendInvitations().remove(this);
+        sender.getSendedInvitations().remove(this);
         receiver.getReceivedInvitations().remove(this);
         this.sender = null;
         this.receiver = null;

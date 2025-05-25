@@ -1,11 +1,10 @@
-package main.java.red_social_academica.red_social_academica.model;
+package red_social_academica.red_social_academica.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import main.java.red_social_academica.model.Invitation;
+//import java.util.*;
 
-import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,21 +63,26 @@ public class User {
     private LocalDate birthdate;
 
     // Relaciones
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "friends",
             joinColumns = @JoinColumn(name = "friend_id"),
             inverseJoinColumns = @JoinColumn(name = "aux_friend_id"))
     private Set<User> friends = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "friends")
     private Set<User> auxFriends = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Invitation> receivedInvitations = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Invitation> sendedInvitations = new HashSet<>();
 
@@ -105,9 +109,11 @@ public class User {
                receivedInvitations.stream().noneMatch(i -> i.esDelUsuario(email));
     }
 
+    @Builder.Default
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
