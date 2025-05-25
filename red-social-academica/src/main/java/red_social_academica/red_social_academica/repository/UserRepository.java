@@ -4,6 +4,7 @@ import red_social_academica.red_social_academica.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
@@ -15,51 +16,62 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Buscar por username (identificador principal)
+    // === BASICOS (con y sin activo) ===
+
     Optional<User> findByUsername(String username);
+    Optional<User> findByUsernameAndActivoTrue(String username);
 
-    // Buscar por email (usado internamente en registro/login)
     Optional<User> findByEmail(String email);
+    Optional<User> findByEmailAndActivoTrue(String email);
 
-    // Verificar existencia
     boolean existsByUsername(String username);
+    boolean existsByUsernameAndActivoTrue(String username);
+
     boolean existsByEmail(String email);
+    boolean existsByEmailAndActivoTrue(String email);
 
-    // Listar usuarios por rol (ADMIN, USER, etc.)
+    // === FILTROS POR ROL ===
+
     List<User> findAllByRole(String role);
-    Page<User> findAllByRole(String role, Pageable pageable);
+    List<User> findAllByRoleAndActivoTrue(String role);
 
-    // Buscar usuarios por nombre o email que contengan texto
+    Page<User> findAllByRole(String role, Pageable pageable);
+    Page<User> findAllByRoleAndActivoTrue(String role, Pageable pageable);
+
+    // === BÚSQUEDAS PERSONALIZADAS ===
+
     @Query("""
         SELECT u FROM User u 
-        WHERE u.role = :role AND 
+        WHERE u.role = :role AND u.activo = true AND 
               (LOWER(CONCAT(u.name, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :searchText, '%')) 
               OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchText, '%')))
         """)
     Page<User> searchByEmailAndNameByRole(@Param("searchText") String searchText,
                                           @Param("role") String role,
                                           Pageable pageable);
-    
-    //Buscar usuarios por carrera
-    @Query("""
-    SELECT u FROM User u 
-    WHERE (:career IS NULL OR u.career = :career) 
-        AND (:search IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) 
-            OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
-    """)
-    Page<User> searchByCareerAndName(@Param("career") String career,
-                                    @Param("search") String search,
-                                    Pageable pageable);
 
-    
-    // Obtener amigos por username (relación ManyToMany)
-    @Query("SELECT u FROM User u JOIN u.friends f WHERE f.username = :username")
+    @Query("""
+        SELECT u FROM User u 
+        WHERE u.activo = true AND
+              (:career IS NULL OR u.career = :career) AND
+              (:search IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) 
+               OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))
+        """)
+    Page<User> searchByCareerAndName(@Param("career") String career,
+                                     @Param("search") String search,
+                                     Pageable pageable);
+
+    // === RELACIONES DE AMISTAD (filtrando activos) ===
+
+    @Query("SELECT u FROM User u JOIN u.friends f WHERE f.username = :username AND u.activo = true")
     Page<User> getFriendsOf(@Param("username") String username, Pageable pageable);
 
-    @Query("SELECT u FROM User u JOIN u.friends f WHERE f.username = :username")
+    @Query("SELECT u FROM User u JOIN u.friends f WHERE f.username = :username AND u.activo = true")
     List<User> getFriendsOf(@Param("username") String username);
 
-    // Bloqueo pesimista opcional para ediciones seguras
+    // === BLOQUEO PESIMISTA ===
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<User> findById(Long id);
+    @NonNull
+    Optional<User> findById(@NonNull Long id);
 }

@@ -42,4 +42,7 @@ public abstract class AuditableEntity {
 
     @Column(name = "motivo_baja")
     protected String motivoBaja;
+
+    @Column(name = "activo", nullable = false)
+    protected boolean activo = true;
 }

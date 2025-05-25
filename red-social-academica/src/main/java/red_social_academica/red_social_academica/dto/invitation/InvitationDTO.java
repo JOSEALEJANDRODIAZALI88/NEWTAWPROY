@@ -46,4 +46,6 @@ public class InvitationDTO implements Serializable {
     @Schema(description = "Fecha de cancelación o eliminación de la invitación", example = "2025-05-25", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaBaja;
 
+    @Schema(description = "Indica si la publicacion esta activa", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
+    private boolean activo;
 }

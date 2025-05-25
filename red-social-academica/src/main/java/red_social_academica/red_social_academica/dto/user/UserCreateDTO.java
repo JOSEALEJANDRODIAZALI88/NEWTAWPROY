@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * DTO utilizado para el registro de nuevos usuarios en la red social académica.
@@ -16,6 +17,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Schema(description = "DTO para registrar un nuevo usuario")
 public class UserCreateDTO implements Serializable {
 
@@ -40,6 +43,22 @@ public class UserCreateDTO implements Serializable {
     @Email(message = "El email debe ser válido")
     @Size(max = 100, message = "El email no puede tener más de 100 caracteres")
     private String email;
+
+    @Schema(description = "URL de la foto de perfil del usuario", example = "https://cdn.misitio.com/perfiles/ana.jpg")
+    @Size(max = 255, message = "La URL no debe superar los 255 caracteres")
+    private String profilePictureUrl;
+
+    @Schema(description = "Biografía o descripción corta del usuario", example = "Estudiante de ingeniería apasionada por la IA")
+    @Size(max = 300, message = "La biografía no debe superar los 300 caracteres")
+    private String bio;
+
+    @Schema(description = "Carrera o especialización del usuario", example = "Ingeniería en Sistemas")
+    @Size(max = 100, message = "La carrera no debe superar los 100 caracteres")
+    private String career;
+
+    @Schema(description = "Fecha de nacimiento del usuario", example = "2002-05-14")
+    @Past(message = "La fecha de nacimiento debe ser anterior a la fecha actual")
+    private LocalDate birthdate;
 
     @Schema(description = "Contraseña para el acceso", example = "segura123")
     @NotBlank(message = "La contraseña es obligatoria")

@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Schema(description = "DTO para actualizar los datos del perfil de un usuario")
 public class UserUpdateDTO implements Serializable {
 

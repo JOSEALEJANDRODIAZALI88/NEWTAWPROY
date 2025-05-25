@@ -52,4 +52,6 @@ public class CommentDTO implements Serializable {
     @Schema(description = "Fecha en la que se dio de baja el comentario", example = "2025-06-01", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaBaja;
 
+    @Schema(description = "Indica si la publicacion esta activa", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
+    private boolean activo;
 }

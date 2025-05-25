@@ -70,4 +70,8 @@ public class UserDTO implements Serializable {
 
     @Schema(description = "Fecha en la que se dio de baja el usuario", example = "2025-06-01", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaBaja;
+
+    @Schema(description = "Indica si el usuario está activo o ha sido dado de baja", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
+    private boolean activo;
+
 }
