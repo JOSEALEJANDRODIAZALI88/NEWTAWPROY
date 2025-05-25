@@ -6,6 +6,12 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 
+/**
+ * Entidad JPA que representa una notificación dirigida a un usuario.
+ * Las notificaciones pueden ser generadas por distintos eventos del sistema:
+ * comentarios, invitaciones, publicaciones, etc. El mensaje es personalizable
+ * y puede incluir un enlace para redirigir al recurso relacionado.
+ */
 @Entity
 @Table(name = "notification")
 @Getter
@@ -13,16 +19,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(of = {"id", "type", "message", "read", "createdAt"})
+@ToString(of = {"id", "message", "read", "createdAt"})
 @EqualsAndHashCode(of = "id")
 public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String type; // COMMENT, INVITATION, EVENT, etc.
 
     @Column(nullable = false, length = 500)
     private String message;
@@ -33,6 +36,9 @@ public class Notification {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @Column(name = "target_url")
+    private String targetUrl;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "recipient_id")

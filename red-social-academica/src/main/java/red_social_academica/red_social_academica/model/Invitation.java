@@ -4,6 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * Entidad JPA que representa una invitación de amistad entre dos usuarios.
+ * Permite establecer relaciones sociales en la plataforma y gestionar
+ * solicitudes pendientes, aceptadas o eliminadas.
+ */
+
+
 @Entity
 @Table(name = "invitation")
 @Getter

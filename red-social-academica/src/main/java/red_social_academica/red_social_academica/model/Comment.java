@@ -6,6 +6,13 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 
+/**
+ * Entidad JPA que representa un comentario realizado por un usuario
+ * en una publicación. Incluye el contenido del comentario, la fecha de creación,
+ * el autor y la publicación asociada.
+ */
+
+
 @Entity
 @Table(name = "comment")
 @Getter

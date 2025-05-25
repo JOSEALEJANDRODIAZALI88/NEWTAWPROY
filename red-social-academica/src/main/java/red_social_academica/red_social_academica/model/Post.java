@@ -5,10 +5,15 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad JPA que representa una publicación realizada por un usuario.
+ * Soporta múltiples formatos combinables: texto, imagen, recurso y evento.
+ * Todos los campos adicionales son opcionales para lograr flexibilidad.
+ */
 @Entity
 @Table(name = "post")
 @Getter
@@ -16,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(of = {"id", "title", "type", "date"})
+@ToString(of = {"id", "title", "date"})
 @EqualsAndHashCode(of = "id")
 public class Post {
 
@@ -24,6 +29,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     @Column(length = 1000)
@@ -32,25 +38,23 @@ public class Post {
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
-    @Column(name = "post_type", nullable = false)
-    private String type; // "TEXT", "EVENT", "RESOURCE"
-
-    @Column(name = "resource_url")
-    private String resourceUrl;
-
-    @Column(name = "event_date")
-    private LocalDate eventDate;
-
+    // URL de imagen (opcional)
     @Column(name = "image_url")
     private String imageUrl;
 
-    private Boolean containsImage;
+    // URL de recurso (PDF, documento, etc.)
+    @Column(name = "resource_url")
+    private String resourceUrl;
+
+    // Fecha de evento (opcional)
+    @Column(name = "event_date")
+    private LocalDate eventDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
+    // Comentarios relacionados a esta publicación
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
-
 }

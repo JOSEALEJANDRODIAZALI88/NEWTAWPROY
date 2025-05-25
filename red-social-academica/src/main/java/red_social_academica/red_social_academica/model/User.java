@@ -12,6 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Entidad JPA que representa a un usuario en el sistema de red social académica.
+ * Incluye datos de identificación, perfil personal, relaciones de amistad,
+ * publicaciones realizadas, comentarios y notificaciones asociadas.
+ */
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -20,7 +26,7 @@ import java.util.Set;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(of = "email")
-@ToString(of = {"id", "email", "name", "lastName", "role"})
+@ToString(of = {"id", "email", "name", "lastName", "username", "role"})
 public class User {
 
     @Id
