@@ -53,6 +53,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // no sesiones
             .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint()))
             .authorizeHttpRequests(auth -> auth
+                // Permitir acceso libre a Swagger y endpoints públicos de autenticación
                 .requestMatchers(
                     "/api/auth/**",
                     "/swagger-ui/**",
@@ -60,9 +61,18 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/swagger-resources/**",
                     "/webjars/**"
-                ).permitAll() // permitir acceso libre a swagger y auth
-                .requestMatchers("/api/admin/**").hasRole("ADMIN") // endpoints admin
-                .anyRequest().authenticated() // todo lo demás requiere login
+                ).permitAll()
+
+                // Restringir los endpoints de administración solo para ADMIN
+                .requestMatchers(
+                    "/api/admin/**",
+                    "/api/admin/usuarios/**",
+                    "/api/admin/posts/**",
+                    "/api/admin/comentarios/**"
+                ).hasRole("ADMIN")
+
+                // Cualquier otra solicitud requiere estar autenticado (rol PUBLIC o ADMIN)
+                .anyRequest().authenticated()
             );
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

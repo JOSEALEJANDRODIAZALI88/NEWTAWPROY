@@ -127,8 +127,8 @@ public class AuthController {
     public ResponseEntity<?> getSessionInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            UserDetails userDetails = (UserDetails) auth.getPrincipal();
-            User user = userRepository.findByUsername(userDetails.getUsername())
+            String username = (String) auth.getPrincipal();  // ✅ CAMBIO HECHO AQUÍ
+            User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("Error: Usuario no encontrado."));
 
             Set<String> roles = user.getRoles().stream()

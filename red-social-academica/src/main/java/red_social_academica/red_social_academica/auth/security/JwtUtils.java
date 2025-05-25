@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Clase utilitaria para la generación y validación de tokens JWT.
@@ -25,16 +26,18 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     /**
-     * Genera un token JWT firmado a partir de los datos de autenticación.
-     * 
-     * @param authentication objeto con el usuario autenticado
-     * @return token JWT generado
+     * Genera un token JWT con username y roles.
      */
     public String generateJwtToken(Authentication authentication) {
         String username = authentication.getName();
 
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
+                .toList();
+
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -42,10 +45,7 @@ public class JwtUtils {
     }
 
     /**
-     * Extrae el username (subject) desde un token JWT.
-     * 
-     * @param token JWT
-     * @return nombre de usuario
+     * Extrae el nombre de usuario (subject) desde el token JWT.
      */
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
@@ -57,10 +57,20 @@ public class JwtUtils {
     }
 
     /**
-     * Verifica si un token es válido (firma + expiración).
-     * 
-     * @param token JWT
-     * @return true si es válido
+     * Extrae los roles desde el token JWT.
+     */
+    public List<String> getRolesFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("roles", List.class);
+    }
+
+    /**
+     * Verifica si un token es válido (firma y expiración).
      */
     public boolean validateJwtToken(String token) {
         try {
@@ -82,10 +92,7 @@ public class JwtUtils {
     }
 
     /**
-     * Extrae el token JWT desde el encabezado Authorization de la request.
-     * 
-     * @param request HTTP
-     * @return el token si existe
+     * Extrae el token JWT del encabezado Authorization.
      */
     public String parseJwt(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
