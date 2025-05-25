@@ -1,5 +1,7 @@
 package red_social_academica.red_social_academica.model;
 
+import red_social_academica.red_social_academica.model.AuditableEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -18,8 +20,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(of = {"sender", "receiver"})
-public class Invitation {
+@EqualsAndHashCode(callSuper = true, of = {"sender", "receiver"})
+public class Invitation extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

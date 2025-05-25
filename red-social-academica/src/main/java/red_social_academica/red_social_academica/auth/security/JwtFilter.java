@@ -16,6 +16,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import red_social_academica.red_social_academica.auth.service.UserDetailsServiceImpl;
 
 import java.io.IOException;
 

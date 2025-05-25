@@ -1,4 +1,4 @@
-package red_social_academica.red_social_academica.auth.security;
+package red_social_academica.red_social_academica.auth.service;
 
 import red_social_academica.red_social_academica.auth.model.Role;
 import red_social_academica.red_social_academica.model.User;

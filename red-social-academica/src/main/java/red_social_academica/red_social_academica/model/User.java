@@ -3,8 +3,9 @@ package red_social_academica.red_social_academica.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-//import java.util.*;
+import java.util.*;
 import red_social_academica.red_social_academica.auth.model.Role;
+import red_social_academica.red_social_academica.model.AuditableEntity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,9 +26,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(of = "username")
+@EqualsAndHashCode(callSuper = true, of = "username")
 @ToString(of = {"id", "username", "name", "lastName"})
-public class User {
+public class User extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

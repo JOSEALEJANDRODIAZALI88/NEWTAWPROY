@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import red_social_academica.red_social_academica.model.AuditableEntity;
+
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.ArrayList;
@@ -22,8 +24,8 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @ToString(of = {"id", "title", "date"})
-@EqualsAndHashCode(of = "id")
-public class Post {
+@EqualsAndHashCode(callSuper = true, of = "id")
+public class Post extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,7 @@
 package red_social_academica.red_social_academica.model;
 
+import red_social_academica.red_social_academica.model.AuditableEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -21,8 +23,8 @@ import java.util.Date;
 @AllArgsConstructor
 @SuperBuilder
 @ToString(of = {"id", "content", "createdAt"})
-@EqualsAndHashCode(of = "id")
-public class Comment {
+@EqualsAndHashCode(callSuper = true, of = "id")
+public class Comment extends AuditableEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
