@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * DTO que representa una invitación de amistad entre dos usuarios.
@@ -32,4 +33,17 @@ public class InvitationDTO implements Serializable {
 
     @Schema(description = "Nombre del destinatario", example = "Ana Gómez")
     private String receiverName;
+
+    @Schema(description = "Fecha de creación de la invitación", example = "2025-05-22", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaAlta;
+
+    @Schema(description = "Fecha de la última modificación de la invitación", example = "2025-05-24", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaModificacion;
+
+    @Schema(description = "Motivo de cancelación o rechazo de la invitación", example = "rechazada por el destinatario", accessMode = Schema.AccessMode.READ_ONLY)
+    private String motivoBaja;
+
+    @Schema(description = "Fecha de cancelación o eliminación de la invitación", example = "2025-05-25", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaBaja;
+
 }

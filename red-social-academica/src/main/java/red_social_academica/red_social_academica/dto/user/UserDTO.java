@@ -58,4 +58,16 @@ public class UserDTO implements Serializable {
     @Schema(description = "Fecha de nacimiento del usuario", example = "2002-05-14")
     @Past(message = "La fecha de nacimiento debe ser anterior a la fecha actual")
     private LocalDate birthdate;
+
+    @Schema(description = "Fecha de creación del perfil", example = "2025-05-10", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaAlta;
+
+    @Schema(description = "Última fecha de modificación del perfil", example = "2025-05-20", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaModificacion;
+
+    @Schema(description = "Motivo de desactivación o baja del usuario", example = "actividad sospechosa", accessMode = Schema.AccessMode.READ_ONLY)
+    private String motivoBaja;
+
+    @Schema(description = "Fecha en la que se dio de baja el usuario", example = "2025-06-01", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaBaja;
 }

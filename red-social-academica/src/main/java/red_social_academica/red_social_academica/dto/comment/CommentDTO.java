@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -38,4 +39,17 @@ public class CommentDTO implements Serializable {
 
     @Schema(description = "ID de la publicación comentada", example = "101")
     private Long postId;
+
+    @Schema(description = "Fecha de creación del comentario", example = "2025-05-10", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaAlta;
+
+    @Schema(description = "Última fecha de modificación del comentario", example = "2025-05-20", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaModificacion;
+
+    @Schema(description = "Motivo de baja del comentario (si fue eliminado)", example = "Contenido inapropiado", accessMode = Schema.AccessMode.READ_ONLY)
+    private String motivoBaja;
+
+    @Schema(description = "Fecha en la que se dio de baja el comentario", example = "2025-06-01", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaBaja;
+
 }

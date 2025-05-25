@@ -51,4 +51,16 @@ public class PostDTO implements Serializable {
 
     @Schema(description = "Nombre del autor del post", example = "Ana Gómez")
     private String authorFullName;
+
+    @Schema(description = "Fecha de creación del post", example = "2025-05-24", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaAlta;
+
+    @Schema(description = "Fecha de la última modificación", example = "2025-05-25", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaModificacion;
+
+    @Schema(description = "Motivo de baja del post (si aplica)", example = "inapropiado", accessMode = Schema.AccessMode.READ_ONLY)
+    private String motivoBaja;
+
+    @Schema(description = "Fecha en que el post fue dado de baja (si aplica)", example = "2025-06-01", accessMode = Schema.AccessMode.READ_ONLY)
+    private LocalDate fechaBaja;
 }
