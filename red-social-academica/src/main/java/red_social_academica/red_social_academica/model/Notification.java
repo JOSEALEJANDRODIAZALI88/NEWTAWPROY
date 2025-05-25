@@ -20,8 +20,8 @@ import java.util.Date;
 @AllArgsConstructor
 @SuperBuilder
 @ToString(of = {"id", "message", "read", "createdAt"})
-@EqualsAndHashCode(of = "id")
-public class Notification {
+@EqualsAndHashCode(callSuper = true, of = "id")
+public class Notification extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +43,7 @@ public class Notification {
     @ManyToOne(optional = false)
     @JoinColumn(name = "recipient_id")
     private User recipient;
+
+    @Column(nullable = false)
+    private boolean activo;
 }

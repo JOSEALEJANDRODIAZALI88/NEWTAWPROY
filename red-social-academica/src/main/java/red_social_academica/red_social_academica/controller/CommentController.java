@@ -69,10 +69,11 @@ public class CommentController {
 
     // === Eliminar ===
     @Operation(summary = "Eliminar lógicamente tu comentario")
-    @DeleteMapping("/{commentId}")
+    @PutMapping("/{commentId}/baja")
     public ResponseEntity<CommentDTO> eliminarComentario(
             @PathVariable Long commentId,
             @RequestParam String motivo) {
         return ResponseEntity.ok(commentService.eliminarComentarioPropio(commentId, motivo));
     }
+
 }

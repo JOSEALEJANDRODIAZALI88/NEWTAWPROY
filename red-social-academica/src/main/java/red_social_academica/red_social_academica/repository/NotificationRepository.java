@@ -5,17 +5,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    // Notificaciones para un usuario
-    List<Notification> findByRecipientUsernameOrderByCreatedAtDesc(String username);
+    // Notificaciones activas para un usuario ordenadas por fecha
+    List<Notification> findByRecipientUsernameAndActivoTrueOrderByCreatedAtDesc(String username);
 
-    // Contar no leídas
-    long countByRecipientUsernameAndReadFalse(String username);
+    // Contar notificaciones activas no leídas
+    long countByRecipientUsernameAndReadFalseAndActivoTrue(String username);
 
-    //Listar las ultimas 10 notificaciones no leidas
-    List<Notification> findTop10ByRecipientUsernameOrderByCreatedAtDesc(String username);
+    // Últimas 10 notificaciones activas para el usuario
+    List<Notification> findTop10ByRecipientUsernameAndActivoTrueOrderByCreatedAtDesc(String username);
 
+    // Obtener por ID solo si está activa
+    Optional<Notification> findByIdAndActivoTrue(Long id);
 }
