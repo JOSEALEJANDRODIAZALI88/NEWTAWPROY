@@ -2,6 +2,8 @@ package red_social_academica.red_social_academica.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,4 +47,23 @@ public abstract class AuditableEntity {
 
     @Column(name = "activo", nullable = false)
     protected boolean activo = true;
+
+    /**
+     * Asigna la fecha de alta antes de persistir la entidad.
+     */
+    @PrePersist
+    protected void onPrePersist() {
+        this.fechaAlta = LocalDate.now();
+        // Si tienes el contexto de usuario, asigna usuarioAlta aquí.
+        // Ejemplo: this.usuarioAlta = SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    /**
+     * Actualiza la fecha de modificación antes de actualizar la entidad.
+     */
+    @PreUpdate
+    protected void onPreUpdate() {
+        this.fechaModificacion = LocalDate.now();
+        // Si tienes el contexto de usuario, asigna usuarioModificacion aquí.
+    }
 }

@@ -41,9 +41,10 @@ public class Notification extends AuditableEntity {
     private String targetUrl;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_id", referencedColumnName = "id") // referencia columna PK
     private User recipient;
 
     @Column(nullable = false)
     private boolean activo;
 }
+

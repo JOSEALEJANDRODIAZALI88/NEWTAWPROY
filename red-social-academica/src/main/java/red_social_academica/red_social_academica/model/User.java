@@ -3,24 +3,13 @@ package red_social_academica.red_social_academica.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import java.util.*;
-import red_social_academica.red_social_academica.auth.model.Role;
-import red_social_academica.red_social_academica.model.AuditableEntity;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Entidad JPA que representa a un usuario en el sistema de red social académica.
- * Incluye datos de identificación, perfil personal, relaciones de amistad,
- * publicaciones realizadas, comentarios y notificaciones asociadas.
- */
+import red_social_academica.red_social_academica.auth.model.Role;
 
 @Entity
-@Table(name = "user")
+@Table(name = "app_user") // Renombrada para evitar conflicto con palabra reservada
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,7 +17,7 @@ import java.util.Set;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = "username")
 @ToString(of = {"id", "username", "name", "lastName"})
-public class User extends AuditableEntity{
+public class User extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,8 +42,6 @@ public class User extends AuditableEntity{
     @Column(name = "password_confirm")
     private String passwordConfirm;
 
-    private String role;
-
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
@@ -68,7 +55,13 @@ public class User extends AuditableEntity{
     @Builder.Default
     private boolean activo = true;
 
-    private Set<Role> roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
     // Relaciones
     @Builder.Default
@@ -94,6 +87,14 @@ public class User extends AuditableEntity{
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Invitation> sendedInvitations = new HashSet<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+
     public String getFullName() {
         return this.name + " " + this.lastName;
     }
@@ -116,14 +117,4 @@ public class User extends AuditableEntity{
                sendedInvitations.stream().noneMatch(i -> i.esDelUsuario(email)) &&
                receivedInvitations.stream().noneMatch(i -> i.esDelUsuario(email));
     }
-
-    @Builder.Default
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications = new ArrayList<>();
-
-
 }

@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import red_social_academica.red_social_academica.model.AuditableEntity;
-
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ import java.util.List;
 @SuperBuilder
 @ToString(of = {"id", "title", "date"})
 @EqualsAndHashCode(callSuper = true, of = "id")
-public class Post extends AuditableEntity{
+public class Post extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +51,7 @@ public class Post extends AuditableEntity{
     private LocalDate eventDate;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     // Comentarios relacionados a esta publicación

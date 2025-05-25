@@ -21,6 +21,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+
 /**
  * Configuración principal de Spring Security.
  */
@@ -33,6 +36,14 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
 
     /**
+     * Punto de entrada para errores de autenticación no autorizada.
+     */
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new Http403ForbiddenEntryPoint();
+    }
+
+    /**
      * Define cómo se manejará la seguridad para las solicitudes HTTP.
      */
     @Bean
@@ -40,8 +51,16 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // desactiva CSRF porque usamos JWT
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // no sesiones
+            .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // login/signup abiertos
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/swagger-resources/**",
+                    "/webjars/**"
+                ).permitAll() // permitir acceso libre a swagger y auth
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // endpoints admin
                 .anyRequest().authenticated() // todo lo demás requiere login
             );

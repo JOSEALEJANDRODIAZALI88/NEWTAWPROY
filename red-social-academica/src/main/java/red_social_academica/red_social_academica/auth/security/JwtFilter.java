@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 // Este filtro se encarga de interceptar las solicitudes HTTP y verificar si contienen un token JWT válido en el encabezado de autorización.
 // Si el token es válido, se establece la autenticación del usuario en el contexto de seguridad de Spring.
+@Component
 public class JwtFilter extends OncePerRequestFilter {
 
     // Inyecta las dependencias necesarias para la autenticación JWT
