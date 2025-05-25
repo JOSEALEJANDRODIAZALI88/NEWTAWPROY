@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 //import java.util.*;
+import red_social_academica.red_social_academica.auth.model.Role;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,14 +19,14 @@ import java.util.Set;
  */
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(of = "email")
-@ToString(of = {"id", "email", "name", "lastName", "username", "role"})
+@EqualsAndHashCode(of = "username")
+@ToString(of = {"id", "username", "name", "lastName"})
 public class User {
 
     @Id
@@ -41,13 +42,14 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "user_name", unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
     @Transient
+    @Column(name = "password_confirm")
     private String passwordConfirm;
 
     private String role;
@@ -61,6 +63,11 @@ public class User {
     private String career;
 
     private LocalDate birthdate;
+
+    @Builder.Default
+    private boolean activo = true;
+
+    private Set<Role> roles;
 
     // Relaciones
     @Builder.Default
