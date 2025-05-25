@@ -1,5 +1,6 @@
 package red_social_academica.red_social_academica.repository;
 
+import red_social_academica.red_social_academica.auth.model.Role;
 import red_social_academica.red_social_academica.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,22 +33,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // === FILTROS POR ROL ===
 
-    List<User> findAllByRole(String role);
-    List<User> findAllByRoleAndActivoTrue(String role);
+    // Cambiado a roles y filtrando por nombre de rol (enum NombreRol)
+    List<User> findAllByRoles_Nombre(Role.NombreRol nombre);
+    List<User> findAllByRoles_NombreAndActivoTrue(Role.NombreRol nombre);
 
-    Page<User> findAllByRole(String role, Pageable pageable);
-    Page<User> findAllByRoleAndActivoTrue(String role, Pageable pageable);
+    Page<User> findAllByRoles_Nombre(Role.NombreRol nombre, Pageable pageable);
+    Page<User> findAllByRoles_NombreAndActivoTrue(Role.NombreRol nombre, Pageable pageable);
 
     // === BÚSQUEDAS PERSONALIZADAS ===
 
     @Query("""
         SELECT u FROM User u 
-        WHERE u.role = :role AND u.activo = true AND 
+        JOIN u.roles r
+        WHERE r.nombre = :role AND u.activo = true AND 
               (LOWER(CONCAT(u.name, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :searchText, '%')) 
-              OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchText, '%')))
+               OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchText, '%')))
         """)
     Page<User> searchByEmailAndNameByRole(@Param("searchText") String searchText,
-                                          @Param("role") String role,
+                                          @Param("role") Role.NombreRol role,
                                           Pageable pageable);
 
     @Query("""

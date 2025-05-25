@@ -1,18 +1,15 @@
 package red_social_academica.red_social_academica.model;
 
-import red_social_academica.red_social_academica.model.AuditableEntity;
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import red_social_academica.red_social_academica.model.AuditableEntity;
 
 /**
  * Entidad JPA que representa una invitación de amistad entre dos usuarios.
  * Permite establecer relaciones sociales en la plataforma y gestionar
  * solicitudes pendientes, aceptadas o eliminadas.
  */
-
-
 @Entity
 @Table(name = "invitation")
 @Getter
@@ -28,9 +25,11 @@ public class Invitation extends AuditableEntity {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private User receiver;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private User sender;
 
     @Column(name = "activo", nullable = false)

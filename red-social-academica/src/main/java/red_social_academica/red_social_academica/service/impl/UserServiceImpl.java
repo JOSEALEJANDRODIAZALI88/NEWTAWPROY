@@ -1,5 +1,6 @@
 package red_social_academica.red_social_academica.service.impl;
 
+import red_social_academica.red_social_academica.auth.model.Role;
 import red_social_academica.red_social_academica.dto.user.*;
 import red_social_academica.red_social_academica.model.User;
 import red_social_academica.red_social_academica.repository.UserRepository;
@@ -8,6 +9,7 @@ import red_social_academica.red_social_academica.validation.UserValidator;
 import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +20,6 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-// IMPORTACIONES OMITIDAS PARA BREVEDAD
-
 @Service
 public class UserServiceImpl implements IUserService {
 
@@ -29,12 +29,17 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private UserValidator userValidator;
 
-    public UserServiceImpl(UserRepository userRepository, UserValidator userValidator) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
+    @Transactional
     public UserDTO crearUsuario(UserCreateDTO dto) {
         userValidator.validarCreacion(dto);
 
@@ -49,6 +54,7 @@ public class UserServiceImpl implements IUserService {
     // === PUBLIC ===
 
     @Override
+    @Transactional
     public UserDTO actualizarPerfil(UserUpdateDTO dto) {
         String usernameActual = getCurrentUsername();
 
@@ -63,6 +69,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public UserDTO eliminarUsuario() {
         String usernameActual = getCurrentUsername();
         User user = userRepository.findByUsernameAndActivoTrue(usernameActual)
@@ -79,6 +86,7 @@ public class UserServiceImpl implements IUserService {
     // === ADMIN ===
 
     @Override
+    @Transactional
     public UserDTO actualizarUsuarioComoAdmin(String username, UserUpdateDTO dto) {
         if (!isAdmin()) {
             throw new SecurityException("Solo los administradores pueden usar esta función");
@@ -95,6 +103,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
     public UserDTO eliminarUsuarioComoAdmin(String username) {
         if (!isAdmin()) {
             throw new SecurityException("Solo los administradores pueden usar esta función");
@@ -121,14 +130,26 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Page<UserDTO> obtenerPorRol(String role, Pageable pageable) {
-        return userRepository.findAllByRoleAndActivoTrue(role, pageable)
+    public Page<UserDTO> obtenerPorRol(String roleStr, Pageable pageable) {
+        Role.NombreRol roleEnum;
+        try {
+            roleEnum = Role.NombreRol.valueOf(roleStr);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Rol inválido: " + roleStr);
+        }
+        return userRepository.findAllByRoles_NombreAndActivoTrue(roleEnum, pageable)
                 .map(this::convertToDTO);
     }
 
     @Override
-    public Page<UserDTO> buscarPorNombreYCorreo(String texto, String role, Pageable pageable) {
-        return userRepository.searchByEmailAndNameByRole(texto, role, pageable)
+    public Page<UserDTO> buscarPorNombreYCorreo(String texto, String roleStr, Pageable pageable) {
+        Role.NombreRol roleEnum;
+        try {
+            roleEnum = Role.NombreRol.valueOf(roleStr);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Rol inválido: " + roleStr);
+        }
+        return userRepository.searchByEmailAndNameByRole(texto, roleEnum, pageable)
                 .map(this::convertToDTO);
     }
 
@@ -186,6 +207,7 @@ public class UserServiceImpl implements IUserService {
                 .bio(dto.getBio())
                 .birthdate(dto.getBirthdate())
                 .profilePictureUrl(dto.getProfilePictureUrl())
+                .password(passwordEncoder.encode(dto.getPassword())) // Corrección clave
                 .build();
     }
 
