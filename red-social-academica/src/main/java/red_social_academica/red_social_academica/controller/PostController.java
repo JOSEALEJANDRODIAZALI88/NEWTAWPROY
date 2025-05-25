@@ -49,13 +49,14 @@ public class PostController {
     }
 
     @Operation(summary = "Eliminar lógicamente una publicación propia")
-    @DeleteMapping("/{postId}")
+    @PutMapping("/{postId}/baja")
     public ResponseEntity<PostDTO> eliminarPost(
             @PathVariable Long postId,
             @RequestParam String motivo) {
         PostDTO eliminada = postService.eliminarPostPropio(postId, motivo);
         return ResponseEntity.ok(eliminada);
     }
+
 
     @Operation(summary = "Obtener detalles de una publicación activa por ID")
     @GetMapping("/{postId}")
