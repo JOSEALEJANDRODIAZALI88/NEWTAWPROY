@@ -1,0 +1,30 @@
+<div class="login-page d-flex align-items-center justify-content-center">
+  <div class="login-panel p-4 bg-white rounded shadow-sm">
+    <h1 class="mb-3 text-primary">FAKEBOOK</h1>
+    <p class="mb-4 text-secondary">
+      Conecta con compañeros, comparte conocimientos y construye tu red profesional.
+    </p>
+    <form (ngSubmit)="login()">
+      <div class="mb-2">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Correo electrónico o teléfono"
+          required
+        >
+      </div>
+      <div class="mb-3">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Contraseña"
+          required
+        >
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar sesión</button>
+    </form>
+    <a class="d-block text-center text-primary small" (click)="login()">¿Olvidaste tu contraseña?</a>
+    <hr>
+    <button class="btn btn-success w-100" (click)="login()">Crear cuenta nueva</button>
+  </div>
+</div>

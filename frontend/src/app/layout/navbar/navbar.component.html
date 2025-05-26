@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">Red Social Académica</a>
-    <button class="btn btn-link p-0 border-0 text-white" (click)="toggle()">
-      <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end mt-2" [class.show]="open">
-      <li><a class="dropdown-item" routerLink="/login">Iniciar Sesión</a></li>
-      <li><a class="dropdown-item" routerLink="/register">Registrarse</a></li>
+  <a class="navbar-brand" href="#">MiRedAcadémica</a>
+  <button class="navbar-toggler" type="button" (click)="toggle()">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div [class.collapse]="!open" class="navbar-collapse">
+    <ul class="navbar-nav ms-auto">
+      <li class="nav-item"><a class="nav-link" routerLink="/home">Inicio</a></li>
+      <li class="nav-item"><a class="nav-link" routerLink="/">Cerrar sesión</a></li>
     </ul>
   </div>
 </nav>
