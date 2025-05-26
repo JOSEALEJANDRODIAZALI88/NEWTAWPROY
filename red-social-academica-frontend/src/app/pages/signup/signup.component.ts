@@ -1,17 +1,22 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-signup',
   standalone: true,
   imports: [ CommonModule, ReactiveFormsModule ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.scss']
 })
-export class LoginComponent {
+export class SignupComponent {
   form: FormGroup;
   errorMsg = '';
   loading = false;
@@ -19,10 +24,11 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    public router: Router
+    private router: Router
   ) {
     this.form = this.fb.nonNullable.group({
       username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
@@ -31,15 +37,18 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading = true;
     this.errorMsg = '';
-    this.auth.login(this.form.value).subscribe({
-      next: res => {
-        localStorage.setItem('token', res.token);
-        this.router.navigate(['/home']);
+    this.auth.signup(this.form.value).subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
       },
       error: (err: any) => {
-        this.errorMsg = err.error?.message || 'Credenciales inválidas';
+        this.errorMsg = err.error?.message || 'Error de registro';
         this.loading = false;
       }
     });
+  }
+
+  logout(): void {
+    this.auth.logout();
   }
 }

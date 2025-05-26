@@ -1,30 +1,46 @@
-<div class="login-page d-flex align-items-center justify-content-center">
-  <div class="login-panel p-4 bg-white rounded shadow-sm">
-    <h1 class="mb-3 text-primary">FAKEBOOK</h1>
-    <p class="mb-4 text-secondary">
-      Conecta con compañeros, comparte conocimientos y construye tu red profesional.
-    </p>
-    <form (ngSubmit)="login()">
-      <div class="mb-2">
+<div class="login-page">
+  <div class="card p-4 shadow-sm">
+    <h3 class="text-center mb-4">Iniciar Sesión</h3>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
         <input
           type="text"
-          class="form-control"
-          placeholder="Correo electrónico o teléfono"
-          required
-        >
+          formControlName="username"
+          class="form-control form-control-lg"
+          placeholder="Correo electrónico o teléfono">
+        <div
+          *ngIf="form.controls['username'].touched && form.controls['username'].invalid"
+          class="text-danger small">
+          Campo obligatorio
+        </div>
       </div>
       <div class="mb-3">
         <input
           type="password"
-          class="form-control"
-          placeholder="Contraseña"
-          required
-        >
+          formControlName="password"
+          class="form-control form-control-lg"
+          placeholder="Contraseña">
+        <div
+          *ngIf="form.controls['password'].touched && form.controls['password'].invalid"
+          class="text-danger small">
+          Campo obligatorio
+        </div>
       </div>
-      <button type="submit" class="btn btn-primary w-100 mb-3">Iniciar sesión</button>
+      <button
+        type="submit"
+        class="btn btn-primary w-100 btn-lg mb-3"
+        [disabled]="form.invalid || loading">
+        {{ loading ? 'Cargando…' : 'Iniciar sesión' }}
+      </button>
+      <div class="text-center">
+        <a class="small" href="#">¿Olvidaste tu contraseña?</a>
+      </div>
     </form>
-    <a class="d-block text-center text-primary small" (click)="login()">¿Olvidaste tu contraseña?</a>
     <hr>
-    <button class="btn btn-success w-100" (click)="login()">Crear cuenta nueva</button>
+    <button
+      class="btn btn-success w-100 btn-lg"
+      (click)="router.navigate(['/signup'])">
+      Crear nueva cuenta
+    </button>
   </div>
 </div>

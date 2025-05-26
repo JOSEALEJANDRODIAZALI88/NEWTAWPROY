@@ -1,37 +1,37 @@
+/* Ruta: src/app/pages/login/login.component.scss */
+
 .login-page {
-  height: 100vh;
-  background: #f0f2f5;
+  /* Ocupa toda la pantalla y usa flexbox */
+  display: flex;
+  align-items: center;    /* Centra verticalmente */
+  justify-content: center; /* Centra horizontalmente */
+  min-height: 100vh;       /* 100% de la altura de la ventana */
+  background-color: #f0f2f5; /* Color de fondo suave */
+  padding: 1rem;           /* Un poco de espacio en móvil */
 }
 
-.login-panel {
-  width: 360px;
-  max-width: 90%;
-  text-align: center;
+.card {
+  width: 100%;
+  max-width: 360px;        /* Ancho fijo parecido a Facebook */
+  border-radius: 8px;
+}
 
-  h1 {
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: 700;
-    text-transform: lowercase;
-  }
+.btn-primary {
+  background-color: #1877f2;
+  border-color: #1877f2;
+}
 
-  p {
-    font-size: 16px;
-  }
+.btn-primary:hover {
+  background-color: #166fe5;
+  border-color: #166fe5;
+}
 
-  .form-control {
-    height: 42px;
-    border-radius: 6px;
-    font-size: 15px;
-  }
+.btn-success {
+  background-color: #42b72a;
+  border-color: #42b72a;
+}
 
-  .btn {
-    font-size: 17px;
-    font-weight: 600;
-    border-radius: 6px;
-  }
-
-  hr {
-    margin: 1rem 0;
-  }
+.btn-success:hover {
+  background-color: #36a420;
+  border-color: #36a420;
 }
