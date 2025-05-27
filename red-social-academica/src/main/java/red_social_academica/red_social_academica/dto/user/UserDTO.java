@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * DTO que representa los datos públicos del usuario para transferencia entre capas.
@@ -59,6 +60,9 @@ public class UserDTO implements Serializable {
     @Past(message = "La fecha de nacimiento debe ser anterior a la fecha actual")
     private LocalDate birthdate;
 
+    @Schema(description = "Usuario que creó este registro", example = "ana_gomez")
+    private String usuarioAlta;
+
     @Schema(description = "Fecha de creación del perfil", example = "2025-05-10", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDate fechaAlta;
 
@@ -74,4 +78,6 @@ public class UserDTO implements Serializable {
     @Schema(description = "Indica si el usuario está activo o ha sido dado de baja", example = "true", accessMode = Schema.AccessMode.READ_ONLY)
     private boolean activo;
 
+    @Schema(description = "Roles asignados al usuario", example = "[\"ROLE_PUBLIC\"]")
+    private List<String> roles;
 }

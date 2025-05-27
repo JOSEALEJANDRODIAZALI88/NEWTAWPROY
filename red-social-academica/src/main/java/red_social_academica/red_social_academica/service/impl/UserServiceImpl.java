@@ -1,11 +1,14 @@
 package red_social_academica.red_social_academica.service.impl;
 
 import red_social_academica.red_social_academica.auth.model.Role;
+import red_social_academica.red_social_academica.auth.model.Role.NombreRol;
+import red_social_academica.red_social_academica.auth.repository.RoleRepository;
 import red_social_academica.red_social_academica.dto.user.*;
 import red_social_academica.red_social_academica.model.User;
 import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.service.IUserService;
 import red_social_academica.red_social_academica.validation.UserValidator;
+
 import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -32,24 +36,8 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserValidator userValidator, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.userValidator = userValidator;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    @Transactional
-    public UserDTO crearUsuario(UserCreateDTO dto) {
-        userValidator.validarCreacion(dto);
-
-        User user = mapFromCreateDTO(dto);
-        user.setFechaAlta(LocalDate.now());
-        user.setUsuarioAlta(getCurrentUsername());
-        user.setActivo(true);
-
-        return convertToDTO(userRepository.save(user));
-    }
+    @Autowired
+    private RoleRepository roleRepository;
 
     // === PUBLIC ===
 
@@ -75,15 +63,29 @@ public class UserServiceImpl implements IUserService {
         User user = userRepository.findByUsernameAndActivoTrue(usernameActual)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado o ya eliminado"));
 
-        user.setActivo(false);
-        user.setFechaBaja(LocalDate.now());
-        user.setUsuarioBaja(usernameActual);
-        user.setMotivoBaja("solicitud del usuario");
+        marcarUsuarioComoBaja(user, "solicitud del usuario", usernameActual);
 
         return convertToDTO(userRepository.save(user));
     }
 
     // === ADMIN ===
+
+    @Override
+    @Transactional
+    public UserDTO crearUsuarioComoAdmin(UserCreateAdminDTO dto) {
+        userValidator.validarCreacion(dto);
+        validarContrasenasIguales(dto.getPassword(), dto.getPasswordConfirm());
+
+        User user = mapFromCreateDTO(dto);
+        user.setActivo(true);
+        user.setUsuarioAlta("ADMIN"); // Puedes usar getCurrentUsername() si el admin está autenticado
+
+        Role rol = obtenerRolDesdeString(dto.getRol());
+        user.setRoles(Set.of(rol));
+
+        User guardado = userRepository.save(user);
+        return convertToDTO(guardado);
+    }
 
     @Override
     @Transactional
@@ -112,12 +114,15 @@ public class UserServiceImpl implements IUserService {
         User user = userRepository.findByUsernameAndActivoTrue(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado o ya eliminado"));
 
-        user.setActivo(false);
-        user.setFechaBaja(LocalDate.now());
-        user.setUsuarioBaja(getCurrentUsername());
-        user.setMotivoBaja("eliminado por administrador");
+        marcarUsuarioComoBaja(user, "eliminado por administrador", getCurrentUsername());
 
         return convertToDTO(userRepository.save(user));
+    }
+
+    @Override
+    public Page<UserDTO> listarTodosUsuarios(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(this::convertToDTO);
     }
 
     // === LECTURA ===
@@ -131,25 +136,14 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Page<UserDTO> obtenerPorRol(String roleStr, Pageable pageable) {
-        Role.NombreRol roleEnum;
-        try {
-            roleEnum = Role.NombreRol.valueOf(roleStr);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Rol inválido: " + roleStr);
-        }
+        Role.NombreRol roleEnum = Role.NombreRol.valueOf(roleStr);
         return userRepository.findAllByRoles_NombreAndActivoTrue(roleEnum, pageable)
                 .map(this::convertToDTO);
     }
 
     @Override
-    public Page<UserDTO> buscarPorNombreYCorreo(String texto, String roleStr, Pageable pageable) {
-        Role.NombreRol roleEnum;
-        try {
-            roleEnum = Role.NombreRol.valueOf(roleStr);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Rol inválido: " + roleStr);
-        }
-        return userRepository.searchByEmailAndNameByRole(texto, roleEnum, pageable)
+    public Page<UserDTO> buscarPorNombreYCorreo(String texto, Pageable pageable) {
+        return userRepository.searchByEmailAndName(texto, pageable)
                 .map(this::convertToDTO);
     }
 
@@ -176,7 +170,7 @@ public class UserServiceImpl implements IUserService {
         return userRepository.findByEmailAndActivoTrue(email).isPresent();
     }
 
-    // === MAPEOS ===
+    // === UTILITARIOS PRIVADOS ===
 
     private UserDTO convertToDTO(User user) {
         return UserDTO.builder()
@@ -194,6 +188,9 @@ public class UserServiceImpl implements IUserService {
                 .fechaBaja(user.getFechaBaja())
                 .motivoBaja(user.getMotivoBaja())
                 .activo(user.isActivo())
+                .roles(user.getRoles().stream()
+                        .map(role -> role.getNombre().name())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
@@ -207,7 +204,7 @@ public class UserServiceImpl implements IUserService {
                 .bio(dto.getBio())
                 .birthdate(dto.getBirthdate())
                 .profilePictureUrl(dto.getProfilePictureUrl())
-                .password(passwordEncoder.encode(dto.getPassword())) // Corrección clave
+                .password(passwordEncoder.encode(dto.getPassword()))
                 .build();
     }
 
@@ -217,5 +214,28 @@ public class UserServiceImpl implements IUserService {
         user.setBio(dto.getBio());
         user.setCareer(dto.getCareer());
         user.setProfilePictureUrl(dto.getProfilePictureUrl());
-    }  
+    }
+
+    private void validarContrasenasIguales(String password, String passwordConfirm) {
+        if (!password.equals(passwordConfirm)) {
+            throw new UserValidator.BusinessException("Las contraseñas no coinciden");
+        }
+    }
+
+    private Role obtenerRolDesdeString(String rolStr) {
+        try {
+            NombreRol nombreRol = NombreRol.valueOf(rolStr);
+            return roleRepository.findByNombre(nombreRol)
+                    .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + rolStr));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Rol inválido: " + rolStr);
+        }
+    }
+
+    private void marcarUsuarioComoBaja(User user, String motivo, String quien) {
+        user.setActivo(false);
+        user.setFechaBaja(LocalDate.now());
+        user.setMotivoBaja(motivo);
+        user.setUsuarioBaja(quien);
+    }
 }

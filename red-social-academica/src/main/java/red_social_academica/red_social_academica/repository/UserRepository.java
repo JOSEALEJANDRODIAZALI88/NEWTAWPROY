@@ -33,7 +33,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // === FILTROS POR ROL ===
 
-    // Cambiado a roles y filtrando por nombre de rol (enum NombreRol)
     List<User> findAllByRoles_Nombre(Role.NombreRol nombre);
     List<User> findAllByRoles_NombreAndActivoTrue(Role.NombreRol nombre);
 
@@ -43,14 +42,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // === BÚSQUEDAS PERSONALIZADAS ===
 
     @Query("""
-        SELECT u FROM User u 
-        JOIN u.roles r
-        WHERE r.nombre = :role AND u.activo = true AND 
+        SELECT u FROM User u
+        WHERE u.activo = true AND 
               (LOWER(CONCAT(u.name, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :searchText, '%')) 
                OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchText, '%')))
         """)
-    Page<User> searchByEmailAndNameByRole(@Param("searchText") String searchText,
-                                          @Param("role") Role.NombreRol role,
+    Page<User> searchByEmailAndName(@Param("searchText") String searchText,
                                           Pageable pageable);
 
     @Query("""

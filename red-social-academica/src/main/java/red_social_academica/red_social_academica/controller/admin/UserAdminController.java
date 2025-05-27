@@ -30,6 +30,26 @@ public class UserAdminController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Listar todos los usuarios (activos e inactivos)")
+    @GetMapping("/listar")
+    public ResponseEntity<Page<UserDTO>> listarTodosUsuarios(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        logger.info("[ADMIN][USUARIO] Listando todos los usuarios (activos e inactivos)");
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserDTO> usuarios = userService.listarTodosUsuarios(pageable);
+        return ResponseEntity.ok(usuarios);
+    }
+
+    @Operation(summary = "Crear un nuevo usuario desde el panel de administrador")
+    @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente por el administrador")
+    @PostMapping("/crear")
+    public ResponseEntity<UserDTO> crearUsuarioComoAdmin(@Valid @RequestBody UserCreateAdminDTO userCreateAdminDTO) {
+        logger.info("[ADMIN][USUARIO] Creando nuevo usuario con rol: {}", userCreateAdminDTO.getRol());
+        UserDTO creado = userService.crearUsuarioComoAdmin(userCreateAdminDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    }
+
     @Operation(summary = "Obtener perfil de cualquier usuario por username")
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> obtenerPorUsername(@PathVariable String username) {
@@ -49,9 +69,9 @@ public class UserAdminController {
     }
 
     @Operation(summary = "Dar de baja a un usuario como administrador")
-    @DeleteMapping("/{username}/baja")
+    @PutMapping("/{username}/baja")
     public ResponseEntity<UserDTO> eliminarUsuarioComoAdmin(@PathVariable String username) {
-        logger.info("[ADMIN][USUARIO] Eliminando usuario: {}", username);
+        logger.info("[ADMIN][USUARIO] Dando de baja a usuario: {}", username);
         UserDTO eliminado = userService.eliminarUsuarioComoAdmin(username);
         return ResponseEntity.ok(eliminado);
     }
@@ -68,16 +88,15 @@ public class UserAdminController {
         return ResponseEntity.ok(usuarios);
     }
 
-    @Operation(summary = "Buscar usuarios por nombre o email filtrando por rol")
+    @Operation(summary = "Buscar usuarios por nombre o email")
     @GetMapping("/buscar")
     public ResponseEntity<Page<UserDTO>> buscarPorNombreYCorreo(
             @RequestParam String texto,
-            @RequestParam String role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        logger.info("[ADMIN][USUARIO] Buscando usuarios con texto='{}', rol='{}'", texto, role);
+        logger.info("[ADMIN][USUARIO] Buscando usuarios con texto='{}', rol='{}'", texto);
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> resultados = userService.buscarPorNombreYCorreo(texto, role, pageable);
+        Page<UserDTO> resultados = userService.buscarPorNombreYCorreo(texto, pageable);
         return ResponseEntity.ok(resultados);
     }
 }

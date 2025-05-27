@@ -13,16 +13,8 @@ import org.springframework.data.domain.Pageable;
  */
 
 public interface IUserService {
-
-    // === Creación ===
-
-    /**
-     * Registra un nuevo usuario.
-     * @param userCreateDTO datos del nuevo usuario.
-     * @return DTO del usuario creado.
-     */
-    UserDTO crearUsuario(UserCreateDTO userCreateDTO);
-
+    // === Creacion (admin) ===
+    UserDTO crearUsuarioComoAdmin(UserCreateAdminDTO dto);
     // === Lectura ===
 
     /**
@@ -43,11 +35,10 @@ public interface IUserService {
     /**
      * Busca usuarios por texto en nombre completo o email, filtrado por rol.
      * @param texto texto de búsqueda.
-     * @param role rol de usuario (ej. ROLE_PUBLIC)
      * @param pageable paginación
      * @return Página de resultados.
      */
-    Page<UserDTO> buscarPorNombreYCorreo(String texto, String role, Pageable pageable);
+    Page<UserDTO> buscarPorNombreYCorreo(String texto, Pageable pageable);
 
     /**
      * Obtiene la lista de amigos de un usuario.
@@ -113,4 +104,7 @@ public interface IUserService {
      * @return true si existe
      */
     boolean existePorEmail(String email);
+
+    Page<UserDTO> listarTodosUsuarios(Pageable pageable);
+
 }

@@ -34,16 +34,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Operation(summary = "Registrar un nuevo usuario")
-    @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente")
-    @PostMapping
-    public ResponseEntity<UserDTO> crearUsuario(
-            @Valid @RequestBody UserCreateDTO userCreateDTO) {
-        logger.info("[USUARIO] Creando usuario: {}", userCreateDTO.getUsername());
-        UserDTO nuevoUsuario = userService.crearUsuario(userCreateDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
-    }
-
     @Operation(summary = "Actualizar perfil del usuario autenticado")
     @PutMapping("/me")
     public ResponseEntity<UserDTO> actualizarPerfil(
