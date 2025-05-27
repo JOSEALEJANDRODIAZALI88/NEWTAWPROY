@@ -4,10 +4,12 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
-  Validators
+  Validators,
+  AbstractControl,
+  ValidationErrors
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, SignupDTO } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -27,9 +29,18 @@ export class SignupComponent {
     private router: Router
   ) {
     this.form = this.fb.nonNullable.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      name:            ['', Validators.required],
+      lastName:        ['', Validators.required],
+      username:        ['', Validators.required],
+      email:           ['', [Validators.required, Validators.email]],
+      profilePictureUrl: [''],
+      bio:             [''],
+      career:          [''],
+      birthdate:       ['', Validators.required],
+      password:        ['', [Validators.required, Validators.minLength(6)]],
+      passwordConfirm: ['', Validators.required],
+    }, {
+      validators: this.mustMatch('password', 'passwordConfirm')
     });
   }
 
@@ -37,18 +48,34 @@ export class SignupComponent {
     if (this.form.invalid) return;
     this.loading = true;
     this.errorMsg = '';
-    this.auth.signup(this.form.value).subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (err: any) => {
+    const dto: SignupDTO = this.form.value;
+    this.auth.signup(dto).subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: err => {
         this.errorMsg = err.error?.message || 'Error de registro';
         this.loading = false;
       }
     });
   }
 
-  logout(): void {
-    this.auth.logout();
+  private mustMatch(controlName: string, matchingControlName: string) {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const formGroup = group as FormGroup;
+      const control = formGroup.controls[controlName];
+      const matchingControl = formGroup.controls[matchingControlName];
+
+      if (control.value !== matchingControl.value) {
+        matchingControl.setErrors({ mustMatch: true });
+        return { mustMatch: true };
+      } else {
+        if (matchingControl.errors?.['mustMatch']) {
+          delete matchingControl.errors['mustMatch'];
+          if (!Object.keys(matchingControl.errors!).length) {
+            matchingControl.setErrors(null);
+          }
+        }
+        return null;
+      }
+    };
   }
 }

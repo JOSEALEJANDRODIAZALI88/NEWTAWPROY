@@ -1,64 +1,46 @@
-<div class="card mx-auto mt-5" style="max-width: 400px;">
-  <div class="card-body">
-    <h3 class="card-title text-center mb-4">Crear Cuenta</h3>
-
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      <div class="mb-3">
-        <input
-          type="text"
-          formControlName="username"
-          class="form-control"
-          placeholder="Usuario">
-        <div
-          *ngIf="form.controls['username'].touched && form.controls['username'].invalid"
-          class="text-danger small">
-          Usuario obligatorio
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <input
-          type="email"
-          formControlName="email"
-          class="form-control"
-          placeholder="Email">
-        <div
-          *ngIf="form.controls['email'].touched && form.controls['email'].invalid"
-          class="text-danger small">
-          Email inválido
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <input
-          type="password"
-          formControlName="password"
-          class="form-control"
-          placeholder="Contraseña">
-        <div
-          *ngIf="form.controls['password'].touched && form.controls['password'].invalid"
-          class="text-danger small">
-          Contraseña obligatoria
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        class="btn btn-success w-100"
-        [disabled]="form.invalid || loading">
-        Registrar
-        <span
-          *ngIf="loading"
-          class="spinner-border spinner-border-sm ms-2"
-          role="status"
-          aria-hidden="true"></span>
-      </button>
-    </form>
-
-    <div *ngIf="errorMsg" class="alert alert-danger mt-3">{{ errorMsg }}</div>
-
-    <div class="text-center mt-3">
-      <a routerLink="/login">Volver a iniciar sesión</a>
-    </div>
+<form [formGroup]="form" (ngSubmit)="submit()" class="signup-form">
+  <input formControlName="name" placeholder="Nombre" />
+  <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+    Nombre obligatorio
   </div>
-</div>
+
+  <input formControlName="lastName" placeholder="Apellido" />
+  <div *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched">
+    Apellido obligatorio
+  </div>
+
+  <input formControlName="username" placeholder="Usuario" />
+  <div *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
+    Usuario obligatorio
+  </div>
+
+  <input formControlName="email" type="email" placeholder="Email" />
+  <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+    Email inválido
+  </div>
+
+  <input formControlName="profilePictureUrl" placeholder="URL de foto (opcional)" />
+
+  <textarea formControlName="bio" placeholder="Biografía (opcional)"></textarea>
+
+  <input formControlName="career" placeholder="Carrera (opcional)" />
+
+  <input formControlName="birthdate" type="date" placeholder="Fecha de nacimiento" />
+  <div *ngIf="form.get('birthdate')?.invalid && form.get('birthdate')?.touched">
+    Fecha obligatoria
+  </div>
+
+  <input formControlName="password" type="password" placeholder="Contraseña" />
+  <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+    Contraseña obligatorio (mín. 6 caracteres)
+  </div>
+
+  <input formControlName="passwordConfirm" type="password" placeholder="Confirmar contraseña" />
+  <div *ngIf="form.get('passwordConfirm')?.errors?.['mustMatch'] && form.get('passwordConfirm')?.touched">
+    Las contraseñas no coinciden
+  </div>
+
+  <button type="submit" [disabled]="loading">Registrar</button>
+
+  <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+</form>
