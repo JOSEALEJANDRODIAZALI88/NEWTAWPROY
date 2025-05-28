@@ -1,46 +1,77 @@
 <form [formGroup]="form" (ngSubmit)="submit()" class="signup-form">
-  <input formControlName="name" placeholder="Nombre" />
-  <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
-    Nombre obligatorio
+  <h2>Crear Cuenta</h2>
+
+  <div class="row">
+    <div class="field">
+      <input formControlName="name" placeholder="Nombre" />
+      <small *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+        Nombre obligatorio
+      </small>
+    </div>
+    <div class="field">
+      <input formControlName="lastName" placeholder="Apellido" />
+      <small *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched">
+        Apellido obligatorio
+      </small>
+    </div>
   </div>
 
-  <input formControlName="lastName" placeholder="Apellido" />
-  <div *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched">
-    Apellido obligatorio
+  <div class="field">
+    <input formControlName="username" placeholder="Usuario" />
+    <small *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
+      Usuario obligatorio
+    </small>
   </div>
 
-  <input formControlName="username" placeholder="Usuario" />
-  <div *ngIf="form.get('username')?.invalid && form.get('username')?.touched">
-    Usuario obligatorio
+  <div class="field">
+    <input formControlName="email" type="email" placeholder="Email" />
+    <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+      Email inválido
+    </small>
   </div>
 
-  <input formControlName="email" type="email" placeholder="Email" />
-  <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-    Email inválido
+  <div class="field">
+    <input formControlName="profilePictureUrl" placeholder="URL de foto (opcional)" />
   </div>
 
-  <input formControlName="profilePictureUrl" placeholder="URL de foto (opcional)" />
-
-  <textarea formControlName="bio" placeholder="Biografía (opcional)"></textarea>
-
-  <input formControlName="career" placeholder="Carrera (opcional)" />
-
-  <input formControlName="birthdate" type="date" placeholder="Fecha de nacimiento" />
-  <div *ngIf="form.get('birthdate')?.invalid && form.get('birthdate')?.touched">
-    Fecha obligatoria
+  <div class="field">
+    <textarea formControlName="bio" placeholder="Biografía (opcional)"></textarea>
   </div>
 
-  <input formControlName="password" type="password" placeholder="Contraseña" />
-  <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
-    Contraseña obligatorio (mín. 6 caracteres)
+  <div class="field">
+    <input formControlName="career" placeholder="Carrera (opcional)" />
   </div>
 
-  <input formControlName="passwordConfirm" type="password" placeholder="Confirmar contraseña" />
-  <div *ngIf="form.get('passwordConfirm')?.errors?.['mustMatch'] && form.get('passwordConfirm')?.touched">
-    Las contraseñas no coinciden
+  <div class="field">
+    <input formControlName="birthdate" type="date" placeholder="Fecha de nacimiento" />
+    <small *ngIf="form.get('birthdate')?.invalid && form.get('birthdate')?.touched">
+      Fecha obligatoria
+    </small>
   </div>
 
-  <button type="submit" [disabled]="loading">Registrar</button>
+  <div class="row">
+    <div class="field">
+      <input formControlName="password" type="password" placeholder="Contraseña" />
+      <small *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+        Contraseña obligatoria (mín. 6 caracteres)
+      </small>
+    </div>
+    <div class="field">
+      <input formControlName="passwordConfirm" type="password" placeholder="Confirmar contraseña" />
+      <small *ngIf="form.get('passwordConfirm')?.errors?.['mustMatch'] && form.get('passwordConfirm')?.touched">
+        Las contraseñas no coinciden
+      </small>
+    </div>
+  </div>
+
+  <button class="btn" type="submit" [disabled]="loading">Registrar</button>
 
   <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <!-- al final de tu <form> -->
+  <p class="login-link">
+    ¿Ya tienes una cuenta?
+    <a [routerLink]="['/login']">Iniciar sesión</a>
+  </p>
+
 </form>

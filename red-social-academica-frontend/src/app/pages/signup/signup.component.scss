@@ -1,2 +1,102 @@
 /* estilos propios de signup */
 /* Si no necesitas nada extra, puede quedar vacío */
+/* red-social-academica-frontend/src/app/pages/signup/signup.component.scss */
+
+.signup-form {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(#000, 0.1);
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+
+  .row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    flex: 1;
+
+    input,
+    textarea {
+      padding: 0.75rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: #1877f2;
+        outline: none;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    small {
+      color: #d00;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .btn {
+    background-color: #1877f2;
+    color: #fff;
+    padding: 0.75rem;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: background 0.2s;
+
+    &:disabled {
+      background: #a3c2f7;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background: #165ec9;
+    }
+  }
+
+  .error {
+    margin-top: 1rem;
+    color: #d00;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+
+    a {
+      color: #1877f2;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

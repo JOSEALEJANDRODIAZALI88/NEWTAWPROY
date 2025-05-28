@@ -1,3 +1,5 @@
+// red-social-academica-frontend/src/app/pages/signup/signup.component.ts
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -8,13 +10,17 @@ import {
   AbstractControl,
   ValidationErrors
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';    // ← Importar RouterModule + Router
 import { AuthService, SignupDTO } from '../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule      // ← Añadir RouterModule aquí
+  ],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss']
 })
@@ -29,16 +35,16 @@ export class SignupComponent {
     private router: Router
   ) {
     this.form = this.fb.nonNullable.group({
-      name:            ['', Validators.required],
-      lastName:        ['', Validators.required],
-      username:        ['', Validators.required],
-      email:           ['', [Validators.required, Validators.email]],
+      name:              ['', Validators.required],
+      lastName:          ['', Validators.required],
+      username:          ['', Validators.required],
+      email:             ['', [Validators.required, Validators.email]],
       profilePictureUrl: [''],
-      bio:             [''],
-      career:          [''],
-      birthdate:       ['', Validators.required],
-      password:        ['', [Validators.required, Validators.minLength(6)]],
-      passwordConfirm: ['', Validators.required],
+      bio:               [''],
+      career:            [''],
+      birthdate:         ['', Validators.required],
+      password:          ['', [Validators.required, Validators.minLength(6)]],
+      passwordConfirm:   ['', Validators.required],
     }, {
       validators: this.mustMatch('password', 'passwordConfirm')
     });
