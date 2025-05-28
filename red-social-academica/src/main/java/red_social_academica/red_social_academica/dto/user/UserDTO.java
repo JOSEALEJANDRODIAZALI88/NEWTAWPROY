@@ -1,6 +1,7 @@
 package red_social_academica.red_social_academica.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
@@ -35,6 +36,12 @@ public class UserDTO implements Serializable {
     @NotBlank(message = "El nombre de usuario es obligatorio")
     @Size(min = 3, max = 30, message = "El nombre de usuario debe tener entre 3 y 30 caracteres")
     private String username;
+
+    @Schema(description = "Registro universitario unico", example = "1822345")
+    @NotBlank(message = "El registro universitario es obligatorio")
+    @Size(min=7, message = "El registro universitario debe tener minimo 7 numeros")
+    @Column(unique = true, nullable = false)
+    private String ru;
 
     @Schema(description = "Nombre del usuario", example = "Ana")
     @NotBlank(message = "El nombre es obligatorio")

@@ -78,7 +78,7 @@ public class UserServiceImpl implements IUserService {
 
         User user = mapFromCreateDTO(dto);
         user.setActivo(true);
-        user.setUsuarioAlta("ADMIN"); // Puedes usar getCurrentUsername() si el admin está autenticado
+        user.setUsuarioAlta(getCurrentUsername());
 
         Role rol = obtenerRolDesdeString(dto.getRol());
         user.setRoles(Set.of(rol));
@@ -176,6 +176,7 @@ public class UserServiceImpl implements IUserService {
         return UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .ru(user.getRu())
                 .email(user.getEmail())
                 .name(user.getName())
                 .lastName(user.getLastName())
@@ -197,6 +198,7 @@ public class UserServiceImpl implements IUserService {
     private User mapFromCreateDTO(UserCreateDTO dto) {
         return User.builder()
                 .username(dto.getUsername())
+                .ru(dto.getRu())
                 .email(dto.getEmail())
                 .name(dto.getName())
                 .lastName(dto.getLastName())

@@ -19,6 +19,7 @@ public class UserValidator {
     public void validarCreacion(UserCreateDTO user) {
         validarEmailUnico(user.getEmail());
         validarUsernameUnico(user.getUsername());
+        validarRuUnico(user.getRu());
         validarDominioEmail(user.getEmail());
         validarNombre(user.getName());
         validarApellido(user.getLastName());
@@ -33,6 +34,12 @@ public class UserValidator {
     public void validarUsernameUnico(String username) {
         if (userRepository.existsByUsernameAndActivoTrue(username)) {
             throw new BusinessException("Ya existe un usuario activo con este nombre de usuario");
+        }
+    }
+
+    public void validarRuUnico(String ru) {
+        if (userRepository.existsByRuAndActivoTrue(ru)) {
+            throw new BusinessException("Ya existe un usuario activo con este Registro Universitario");
         }
     }
 

@@ -31,6 +31,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByEmailAndActivoTrue(String email);
 
+    boolean existsByRu(String ru);
+    boolean existsByRuAndActivoTrue(String ru);
+
     // === FILTROS POR ROL ===
 
     List<User> findAllByRoles_Nombre(Role.NombreRol nombre);
