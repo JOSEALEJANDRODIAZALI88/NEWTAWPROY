@@ -8,6 +8,8 @@ import red_social_academica.red_social_academica.model.User;
 import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.service.IUserService;
 import red_social_academica.red_social_academica.validation.UserValidator;
+import red_social_academica.red_social_academica.validation.exception.BusinessException;
+
 
 import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
@@ -220,7 +222,7 @@ public class UserServiceImpl implements IUserService {
 
     private void validarContrasenasIguales(String password, String passwordConfirm) {
         if (!password.equals(passwordConfirm)) {
-            throw new UserValidator.BusinessException("Las contraseñas no coinciden");
+            throw new BusinessException("Las contraseñas no coinciden");
         }
     }
 

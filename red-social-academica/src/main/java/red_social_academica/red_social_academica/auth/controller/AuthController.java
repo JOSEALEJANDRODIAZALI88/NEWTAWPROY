@@ -10,6 +10,7 @@ import red_social_academica.red_social_academica.dto.user.UserDTO;
 import red_social_academica.red_social_academica.model.User;
 import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.validation.UserValidator;
+import red_social_academica.red_social_academica.validation.exception.BusinessException;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class AuthController {
         userValidator.validarCreacion(userCreateDTO);
 
         if (!userCreateDTO.getPassword().equals(userCreateDTO.getPasswordConfirm())) {
-            throw new UserValidator.BusinessException("Las contraseñas no coinciden");
+            throw new BusinessException("Las contraseñas no coinciden");
         }
 
         // Crear entidad User
@@ -107,7 +108,9 @@ public class AuthController {
         user.setBio(userCreateDTO.getBio());
         user.setCareer(userCreateDTO.getCareer());
         user.setBirthdate(userCreateDTO.getBirthdate());
+        user.setRu(userCreateDTO.getRu());
         user.setActivo(true);
+        
 
         // Roles
         Set<Role> roles = new HashSet<>();
@@ -130,6 +133,7 @@ public class AuthController {
                 .bio(savedUser.getBio())
                 .career(savedUser.getCareer())
                 .birthdate(savedUser.getBirthdate())
+                .ru(savedUser.getRu())
                 .usuarioAlta(savedUser.getUsername())
                 .fechaAlta(savedUser.getFechaAlta())
                 .fechaModificacion(savedUser.getFechaModificacion())

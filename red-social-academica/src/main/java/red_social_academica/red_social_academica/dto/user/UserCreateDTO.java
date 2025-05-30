@@ -40,7 +40,7 @@ public class UserCreateDTO implements Serializable {
 
     @Schema(description = "Registro universitario unico", example = "1822345")
     @NotBlank(message = "El registro universitario es obligatorio")
-    @Size(min=7, message = "El registro universitario debe tener minimo 7 numeros")
+    @Size(min = 7, message = "El registro universitario debe tener minimo 7 numeros")
     @Column(unique = true, nullable = false)
     private String ru;
 

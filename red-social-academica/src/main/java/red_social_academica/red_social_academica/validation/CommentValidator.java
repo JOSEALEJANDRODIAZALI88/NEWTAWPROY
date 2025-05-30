@@ -2,6 +2,7 @@ package red_social_academica.red_social_academica.validation;
 
 import org.springframework.stereotype.Component;
 import red_social_academica.red_social_academica.dto.comment.CommentCreateDTO;
+import red_social_academica.red_social_academica.validation.exception.BusinessException;
 
 @Component
 public class CommentValidator {
@@ -23,12 +24,6 @@ public class CommentValidator {
     private void validarPostId(Long postId) {
         if (postId == null || postId <= 0) {
             throw new BusinessException("El ID del post es obligatorio y debe ser válido");
-        }
-    }
-
-    public static class BusinessException extends RuntimeException {
-        public BusinessException(String mensaje) {
-            super(mensaje);
         }
     }
 }
