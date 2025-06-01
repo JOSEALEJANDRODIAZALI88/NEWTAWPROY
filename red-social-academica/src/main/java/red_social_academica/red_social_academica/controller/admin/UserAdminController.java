@@ -35,9 +35,15 @@ public class UserAdminController {
     public ResponseEntity<Page<UserDTO>> listarTodosUsuarios(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        logger.info("[ADMIN][USUARIO] Listando todos los usuarios (activos e inactivos)");
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio listarTodosUsuarios: {}", inicio);
+
         Pageable pageable = PageRequest.of(page, size);
         Page<UserDTO> usuarios = userService.listarTodosUsuarios(pageable);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin listarTodosUsuarios: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(usuarios);
     }
 
@@ -45,16 +51,28 @@ public class UserAdminController {
     @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente por el administrador")
     @PostMapping("/crear")
     public ResponseEntity<UserDTO> crearUsuarioComoAdmin(@Valid @RequestBody UserCreateAdminDTO userCreateAdminDTO) {
-        logger.info("[ADMIN][USUARIO] Creando nuevo usuario con rol: {}", userCreateAdminDTO.getRol());
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio crearUsuarioComoAdmin con rol: {}", userCreateAdminDTO.getRol());
+
         UserDTO creado = userService.crearUsuarioComoAdmin(userCreateAdminDTO);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin crearUsuarioComoAdmin: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     @Operation(summary = "Obtener perfil de cualquier usuario por username")
     @GetMapping("/{username}")
     public ResponseEntity<UserDTO> obtenerPorUsername(@PathVariable String username) {
-        logger.info("[ADMIN][USUARIO] Consultando perfil: {}", username);
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio obtenerPorUsername: {}", inicio);
+
         UserDTO usuario = userService.obtenerPorUsername(username);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin obtenerPorUsername: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(usuario);
     }
 
@@ -63,16 +81,28 @@ public class UserAdminController {
     public ResponseEntity<UserDTO> actualizarUsuarioComoAdmin(
             @PathVariable String username,
             @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
-        logger.info("[ADMIN][USUARIO] Actualizando usuario: {}", username);
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio actualizarUsuarioComoAdmin: {}", inicio);
+
         UserDTO actualizado = userService.actualizarUsuarioComoAdmin(username, userUpdateDTO);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin actualizarUsuarioComoAdmin: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(actualizado);
     }
 
     @Operation(summary = "Dar de baja a un usuario como administrador")
     @PutMapping("/{username}/baja")
     public ResponseEntity<UserDTO> eliminarUsuarioComoAdmin(@PathVariable String username) {
-        logger.info("[ADMIN][USUARIO] Dando de baja a usuario: {}", username);
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio eliminarUsuarioComoAdmin: {}", inicio);
+
         UserDTO eliminado = userService.eliminarUsuarioComoAdmin(username);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin eliminarUsuarioComoAdmin: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(eliminado);
     }
 
@@ -82,9 +112,15 @@ public class UserAdminController {
             @PathVariable String role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        logger.info("[ADMIN][USUARIO] Listando usuarios por rol: {}", role);
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio obtenerPorRol: {}", inicio);
+
         Pageable pageable = PageRequest.of(page, size);
         Page<UserDTO> usuarios = userService.obtenerPorRol(role, pageable);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin obtenerPorRol: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(usuarios);
     }
 
@@ -94,9 +130,15 @@ public class UserAdminController {
             @RequestParam String texto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        logger.info("[ADMIN][USUARIO] Buscando usuarios con texto='{}', rol='{}'", texto);
+        long inicio = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Inicio buscarPorNombreYCorreo con texto='{}'", texto);
+
         Pageable pageable = PageRequest.of(page, size);
         Page<UserDTO> resultados = userService.buscarPorNombreYCorreo(texto, pageable);
+
+        long fin = System.currentTimeMillis();
+        logger.info("[ADMIN][USUARIO] Fin buscarPorNombreYCorreo: {} (Duración: {} ms)", fin, (fin - inicio));
+
         return ResponseEntity.ok(resultados);
     }
 }

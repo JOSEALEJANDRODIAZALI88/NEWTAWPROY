@@ -1,5 +1,7 @@
 package red_social_academica.red_social_academica.dto.user;
 
+import java.io.Serializable;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -15,7 +17,7 @@ import lombok.*;
 @Getter
 @Setter
 @Schema(description = "DTO para crear un nuevo usuario desde el panel de administrador")
-public class UserCreateAdminDTO extends UserCreateDTO {
+public class UserCreateAdminDTO extends UserCreateDTO implements Serializable {
 
     @Schema(
         description = "Rol que se asignará al nuevo usuario",

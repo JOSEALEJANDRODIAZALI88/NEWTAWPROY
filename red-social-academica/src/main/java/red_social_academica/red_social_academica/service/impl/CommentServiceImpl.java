@@ -11,6 +11,9 @@ import red_social_academica.red_social_academica.service.ICommentService;
 import red_social_academica.red_social_academica.validation.CommentValidator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +46,8 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     @Transactional
+    @CachePut(value = "comentario", key = "#result.id")
+    @CacheEvict(value = {"comentariosDePost", "comentariosDeUsuario"}, allEntries = true)
     public CommentDTO crearComentario(String username, CommentCreateDTO dto) {
         commentValidator.validarCreacion(dto);
 
@@ -58,6 +63,8 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     @Transactional
+    @CachePut(value = "comentario", key = "#commentId")
+    @CacheEvict(value = {"comentariosDePost", "comentariosDeUsuario"}, allEntries = true)
     public CommentDTO actualizarComentarioPropio(Long commentId, CommentUpdateDTO dto) {
         String actual = getCurrentUsername();
 
@@ -74,6 +81,8 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     @Transactional
+    @CachePut(value = "comentario", key = "#commentId")
+    @CacheEvict(value = {"comentariosDePost", "comentariosDeUsuario"}, allEntries = true)
     public CommentDTO actualizarComentarioComoAdmin(Long commentId, CommentUpdateDTO dto) {
         if (!isAdmin()) {
             throw new SecurityException("Acceso restringido a administradores");
@@ -88,6 +97,7 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"comentario", "comentariosDePost", "comentariosDeUsuario"}, allEntries = true)
     public CommentDTO eliminarComentarioPropio(Long commentId, String motivoBaja) {
         String actual = getCurrentUsername();
 
@@ -104,6 +114,7 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"comentario", "comentariosDePost", "comentariosDeUsuario"}, allEntries = true)
     public CommentDTO eliminarComentarioComoAdmin(Long commentId, String motivoBaja) {
         if (!isAdmin()) {
             throw new SecurityException("Solo administradores pueden eliminar comentarios ajenos");
@@ -117,6 +128,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
+    @Cacheable(value = "comentariosDePost", key = "#postId")
     public List<CommentDTO> obtenerComentariosDePost(Long postId) {
         return commentRepository.findByPostIdAndActivoTrueOrderByCreatedAtAsc(postId).stream()
                 .map(this::convertToDTO)
@@ -124,6 +136,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
+    @Cacheable(value = "comentariosDeUsuario", key = "#username")
     public List<CommentDTO> obtenerComentariosDeUsuario(String username) {
         return commentRepository.findByAuthorUsernameAndActivoTrue(username).stream()
                 .map(this::convertToDTO)
@@ -131,6 +144,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
+    @Cacheable(value = "comentariosDeUsuarioPaginado", key = "#username + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<CommentDTO> obtenerComentariosDeUsuario(String username, Pageable pageable) {
         return commentRepository.findByAuthorUsernameAndActivoTrue(username, pageable)
                 .map(this::convertToDTO);

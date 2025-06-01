@@ -8,6 +8,9 @@ import red_social_academica.red_social_academica.repository.UserRepository;
 import red_social_academica.red_social_academica.service.INotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notificaciones", key = "#username") // limpia la cache cuando se crea
     public NotificationDTO crearNotificacion(String username, String message, String targetUrl) {
         User recipient = userRepository.findByUsernameAndActivoTrue(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado o inactivo"));
@@ -46,6 +50,7 @@ public class NotificationServiceImpl implements INotificationService {
     }
 
     @Override
+    @Cacheable(value = "notificaciones", key = "#username")
     public List<NotificationDTO> obtenerTodas(String username) {
         return notificationRepository.findByRecipientUsernameAndActivoTrueOrderByCreatedAtDesc(username)
                 .stream().map(this::convertToDTO).collect(Collectors.toList());
@@ -64,6 +69,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CachePut(value = "notificaciones", key = "#username") // actualiza la cache del usuario
     public NotificationDTO marcarComoLeida(Long id, String username) {
         Notification notification = notificationRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Notificacion no encontrada o inactiva"));
@@ -80,6 +86,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notificaciones", key = "#username") // elimina la cache del usuario
     public NotificationDTO eliminarNotificacion(Long id, String username) {
         Notification notification = notificationRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Notificacion no encontrada o ya eliminada"));

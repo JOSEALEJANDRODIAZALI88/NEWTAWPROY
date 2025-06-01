@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -39,6 +42,7 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"postPorId", "top10Posts"}, allEntries = true)
     public PostDTO crearPost(String username, PostCreateDTO dto) {
         postValidator.validarCreacion(dto);
         User user = userRepository.findByUsernameAndActivoTrue(username)
@@ -52,6 +56,8 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     @Transactional
+    @CachePut(value = "postPorId", key = "#postId")
+    @CacheEvict(value = "top10Posts", allEntries = true)
     public PostDTO actualizarPostPropio(Long postId, PostUpdateDTO dto) {
         String actual = getCurrentUsername();
         Post post = postRepository.findByIdAndActivoTrue(postId)
@@ -73,6 +79,8 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     @Transactional
+    @CachePut(value = "postPorId", key = "#postId")
+    @CacheEvict(value = "top10Posts", allEntries = true)
     public PostDTO actualizarPostComoAdmin(Long postId, PostUpdateDTO dto) {
         if (!isAdmin()) {
             throw new SecurityException("Solo administradores pueden editar cualquier post");
@@ -93,6 +101,7 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"postPorId", "top10Posts"}, key = "#postId", allEntries = true)
     public PostDTO eliminarPostPropio(Long postId, String motivo) {
         String actual = getCurrentUsername();
         Post post = postRepository.findByIdAndActivoTrue(postId)
@@ -114,6 +123,7 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"postPorId", "top10Posts"}, key = "#postId", allEntries = true)
     public PostDTO eliminarPostComoAdmin(Long postId, String motivo) {
         if (!isAdmin()) {
             throw new SecurityException("Solo administradores pueden eliminar cualquier post");
@@ -133,6 +143,7 @@ public class PostServiceImpl implements IPostService {
     // === CONSULTAS ===
 
     @Override
+    @Cacheable(value = "postPorId", key = "#postId")
     public PostDTO obtenerPorId(Long postId) {
         Post post = postRepository.findByIdAndActivoTrue(postId)
                 .orElseThrow(() -> new RuntimeException("Publicacion no encontrada o inactiva"));
@@ -152,6 +163,7 @@ public class PostServiceImpl implements IPostService {
     }
 
     @Override
+    @Cacheable(value = "top10Posts")
     public List<PostDTO> obtenerTop10PublicacionesRecientes() {
         return postRepository.findTop10ByActivoTrueOrderByDateDesc().stream()
                 .map(this::convertToDTO)

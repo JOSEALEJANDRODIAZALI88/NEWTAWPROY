@@ -10,10 +10,11 @@ import red_social_academica.red_social_academica.service.IUserService;
 import red_social_academica.red_social_academica.validation.UserValidator;
 import red_social_academica.red_social_academica.validation.exception.BusinessException;
 
-
 import static red_social_academica.red_social_academica.auth.security.AuthUtils.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userByUsernameCache", "usersByRoleCache", "usersBySearchCache", "friendsCache"}, key = "#root.target.getCurrentUsername()")
     public UserDTO actualizarPerfil(UserUpdateDTO dto) {
         String usernameActual = getCurrentUsername();
 
@@ -60,6 +62,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userByUsernameCache", "usersByRoleCache", "usersBySearchCache", "friendsCache"}, key = "#root.target.getCurrentUsername()")
     public UserDTO eliminarUsuario() {
         String usernameActual = getCurrentUsername();
         User user = userRepository.findByUsernameAndActivoTrue(usernameActual)
@@ -74,6 +77,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userByUsernameCache", "usersByRoleCache", "usersBySearchCache", "friendsCache"}, allEntries = true)
     public UserDTO crearUsuarioComoAdmin(UserCreateAdminDTO dto) {
         userValidator.validarCreacion(dto);
         validarContrasenasIguales(dto.getPassword(), dto.getPasswordConfirm());
@@ -91,6 +95,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userByUsernameCache", "usersByRoleCache", "usersBySearchCache", "friendsCache"}, key = "#username")
     public UserDTO actualizarUsuarioComoAdmin(String username, UserUpdateDTO dto) {
         if (!isAdmin()) {
             throw new SecurityException("Solo los administradores pueden usar esta función");
@@ -108,6 +113,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"userByUsernameCache", "usersByRoleCache", "usersBySearchCache", "friendsCache"}, key = "#username")
     public UserDTO eliminarUsuarioComoAdmin(String username) {
         if (!isAdmin()) {
             throw new SecurityException("Solo los administradores pueden usar esta función");
@@ -122,6 +128,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Cacheable(value = "allUsersCache")
     public Page<UserDTO> listarTodosUsuarios(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(this::convertToDTO);
@@ -130,6 +137,7 @@ public class UserServiceImpl implements IUserService {
     // === LECTURA ===
 
     @Override
+    @Cacheable(value = "userByUsernameCache", key = "#username")
     public UserDTO obtenerPorUsername(String username) {
         User user = userRepository.findByUsernameAndActivoTrue(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado o inactivo"));
@@ -137,6 +145,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Cacheable(value = "usersByRoleCache", key = "#roleStr + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<UserDTO> obtenerPorRol(String roleStr, Pageable pageable) {
         Role.NombreRol roleEnum = Role.NombreRol.valueOf(roleStr);
         return userRepository.findAllByRoles_NombreAndActivoTrue(roleEnum, pageable)
@@ -144,12 +153,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Cacheable(value = "usersBySearchCache", key = "#texto + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<UserDTO> buscarPorNombreYCorreo(String texto, Pageable pageable) {
         return userRepository.searchByEmailAndName(texto, pageable)
                 .map(this::convertToDTO);
     }
 
     @Override
+    @Cacheable(value = "friendsCache", key = "#username")
     public List<UserDTO> obtenerAmigos(String username) {
         return userRepository.getFriendsOf(username).stream()
                 .map(this::convertToDTO)
@@ -157,6 +168,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Cacheable(value = "friendsCache", key = "#username + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<UserDTO> obtenerAmigos(String username, Pageable pageable) {
         return userRepository.getFriendsOf(username, pageable)
                 .map(this::convertToDTO);

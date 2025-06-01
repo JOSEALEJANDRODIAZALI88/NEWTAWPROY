@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -30,6 +33,7 @@ public class InvitationServiceImpl implements IInvitationService {
 
     @Override
     @Transactional
+    @CachePut(value = "invitaciones", key = "#senderUsername + '-' + #dto.receiverUsername")
     public InvitationDTO enviarInvitacion(String senderUsername, InvitationCreateDTO dto) {
         invitationValidator.validarEnvio(senderUsername, dto.getReceiverUsername());
 
@@ -57,6 +61,7 @@ public class InvitationServiceImpl implements IInvitationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "invitaciones", allEntries = true)
     public InvitationDTO aceptarInvitacion(Long invitationId, String receiverUsername) {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .filter(Invitation::isActivo)
@@ -77,6 +82,7 @@ public class InvitationServiceImpl implements IInvitationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "invitaciones", allEntries = true)
     public InvitationDTO rechazarInvitacion(Long invitationId, String username) {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .filter(Invitation::isActivo)
@@ -95,6 +101,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "invitacionesEnviadas", key = "#username")
     public List<InvitationDTO> obtenerInvitacionesEnviadas(String username) {
         return invitationRepository.findBySenderUsernameAndActivoTrue(username).stream()
                 .map(this::convertToDTO)
@@ -102,6 +109,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "invitacionesRecibidas", key = "#username")
     public List<InvitationDTO> obtenerInvitacionesRecibidas(String username) {
         return invitationRepository.findByReceiverUsernameAndActivoTrue(username).stream()
                 .map(this::convertToDTO)
@@ -109,6 +117,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "todasInvitacionesActivas")
     public List<InvitationDTO> obtenerTodasInvitacionesActivas() {
         return invitationRepository.findAllByActivoTrue().stream()
                 .map(this::convertToDTO)
@@ -117,6 +126,7 @@ public class InvitationServiceImpl implements IInvitationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "invitaciones", allEntries = true)
     public InvitationDTO cancelarInvitacion(Long invitationId, String senderUsername) {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .filter(Invitation::isActivo)
@@ -135,6 +145,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "invitacionesPendientes", key = "#username")
     public List<InvitationDTO> obtenerInvitacionesPendientesRecibidas(String username) {
         return invitationRepository.findByReceiverUsernameAndActivoTrue(username).stream()
                 .map(this::convertToDTO)
@@ -142,6 +153,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "detalleInvitacion", key = "#invitationId")
     public InvitationDTO obtenerDetalleInvitacion(Long invitationId, String username, String role) {
         Invitation invitation = invitationRepository.findById(invitationId)
                 .orElseThrow(() -> new RuntimeException("Invitacion no encontrada"));
@@ -158,6 +170,7 @@ public class InvitationServiceImpl implements IInvitationService {
     }
 
     @Override
+    @Cacheable(value = "invitacionesExistentes", key = "#senderUsername + '-' + #receiverUsername")
     public boolean yaExisteInvitacion(String senderUsername, String receiverUsername) {
         return invitationRepository.existsBySenderUsernameAndReceiverUsernameAndActivoTrue(senderUsername,
                 receiverUsername);
@@ -179,5 +192,4 @@ public class InvitationServiceImpl implements IInvitationService {
                 .activo(inv.isActivo())
                 .build();
     }
-
 }

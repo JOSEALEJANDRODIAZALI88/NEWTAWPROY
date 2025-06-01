@@ -1,6 +1,7 @@
 package red_social_academica.red_social_academica.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import red_social_academica.red_social_academica.repository.RegistroUniversitarioRepository;
@@ -24,6 +25,7 @@ public class RegistroUniversitarioServiceImpl implements IRegistroUniversitarioS
      */
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ruValidoCache", key = "#ru")
     public boolean esRuValido(String ru) {
         return registroUniversitarioRepository.existsByRu(ru);
     }
