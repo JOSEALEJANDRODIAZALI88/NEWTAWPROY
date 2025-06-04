@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 
 /**
- * Inicializa roles y un usuario administrador por defecto al arrancar la aplicación.
+ * Inicializa roles y un usuario administrador por defecto al arrancar la
+ * aplicación.
  */
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
@@ -53,10 +54,11 @@ public class DatabaseInitializer implements CommandLineRunner {
                     .name("Administrador")
                     .lastName("Sistema")
                     .password(passwordEncoder.encode("admin123"))
+                    .passwordConfirm("admin123") // ← campo requerido
+                    .ru("100200300") // ← campo requerido (puede ser cualquier string válido)
                     .roles(Set.of(
-                        rolRepository.findByNombre(NombreRol.ROLE_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Rol no encontrado"))
-                    ))
+                            rolRepository.findByNombre(NombreRol.ROLE_ADMIN)
+                                    .orElseThrow(() -> new RuntimeException("Rol no encontrado"))))
                     .build();
 
             userRepository.save(admin);
