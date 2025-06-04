@@ -5,6 +5,7 @@ import java.io.Serializable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * DTO para crear un nuevo usuario desde el panel de administrador.
@@ -16,7 +17,9 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @Getter
 @Setter
+@SuperBuilder
 @Schema(description = "DTO para crear un nuevo usuario desde el panel de administrador")
+
 public class UserCreateAdminDTO extends UserCreateDTO implements Serializable {
 
     @Schema(
