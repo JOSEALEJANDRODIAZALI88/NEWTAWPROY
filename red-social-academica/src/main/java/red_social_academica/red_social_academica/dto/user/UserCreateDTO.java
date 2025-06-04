@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -17,7 +16,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 @Getter
 @Setter
 @Schema(description = "DTO para registrar un nuevo usuario")

@@ -1,62 +1,59 @@
-Instala Node.js
-Asegúrate de tener instalada una versión LTS de Node.js (≥18), que ya incluye npm. Puedes descargarla de
-https://nodejs.org/
+# Frontend
 
-Instala el Angular CLI
-Abre una terminal y ejecuta:
-npm install -g @angular/cli
-Esto instala la herramienta ng de forma global.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.13.
 
-Comprueba la instalación
-Verifica las versiones:
+## Development server
 
+To start a local development server, run:
 
-node --version
-npm --version
-ng version
+```bash
+ng serve
+```
 
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-EN MI CASO ESATSA SONA LAS VERSIONES
-C:\Users\DIAZ>node --version
-v22.15.0
+## Code scaffolding
 
-C:\Users\DIAZ>npm --version
-10.9.2
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
-C:\Users\DIAZ>ng version
+```bash
+ng generate component component-name
+```
 
-     _                      _                 ____ _     ___
-    / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
-/ △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
-/ ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
-/_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
-|___/
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
+```bash
+ng generate --help
+```
 
-Angular CLI: 19.2.13
-Node: 22.15.0
-Package Manager: npm 10.9.2
-OS: win32 x64
+## Building
 
-Angular:
-...
+To build the project run:
 
-Package                      Version
-------------------------------------------------------
-@angular-devkit/architect    0.1902.13 (cli-only)
-@angular-devkit/core         19.2.13 (cli-only)
-@angular-devkit/schematics   19.2.13 (cli-only)
-@schematics/angular          19.2.13 (cli-only)
+```bash
+ng build
+```
 
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-C:\Users\DIAZ>
+## Running unit tests
 
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
+```bash
+ng test
+```
 
-LUEGO PARA EJECUTAR ;
-cd mi-proyecto
-npm install      # instala las dependencias
-ng serve         # compila y levanta el servidor de desarrollo
-Abre tu navegador
-Ve a
-http://localhost:4200
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
