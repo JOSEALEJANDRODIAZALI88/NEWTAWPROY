@@ -1,4 +1,4 @@
-// src/app/pages/admin/admin-usuarios-listar.component.ts
+// src/app/pages/admin/admin-usuarios/admin-usuarios-listar.component.ts
 import { Component }    from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -7,8 +7,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [ CommonModule ],
   template: `
-    <h3>Listar Usuarios</h3>
-    <p>Aquí iría la tabla o lista de todos los usuarios.</p>
+    <h3>Listar Usuarios (Admin)</h3>
+    <p>Aquí iría la tabla de usuarios para el administrador.</p>
   `
 })
 export class AdminUsuariosListarComponent { }

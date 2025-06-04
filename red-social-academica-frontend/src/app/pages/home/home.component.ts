@@ -1,15 +1,15 @@
 // src/app/pages/home/home.component.ts
-import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { Component }    from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthService }  from '../../services/auth.service';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  template: `
-    <h1>Bienvenido, Usuario</h1>
-    <button (click)="logout()">Cerrar sesión</button>
-  `
+  imports: [ CommonModule ],
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  constructor(private auth: AuthService) {}
-  logout() { this.auth.logout(); }
+  constructor(public authService: AuthService) { }
 }

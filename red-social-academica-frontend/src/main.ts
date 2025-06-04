@@ -1,14 +1,21 @@
 // src/main.ts
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter }       from '@angular/router';
-import { importProvidersFrom } from '@angular/core';
-import { HttpClientModule }    from '@angular/common/http';
-import { AppComponent }        from './app/app.component';
-import { routes }              from './app/app.routes';
+import { enableProdMode }                         from '@angular/core';
+import { bootstrapApplication }                   from '@angular/platform-browser';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpClient }                      from '@angular/common/http';
+import { AppComponent }                           from './app/app.component';
+import { routes }                                 from './app/app.routes';
+
+// Si quieres habilitar production mode según tu entorno, descomenta lo siguiente:
+// import { environment } from './environments/environment';
+// if (environment.production) {
+//   enableProdMode();
+// }
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes),
-    importProvidersFrom(HttpClientModule)
+    provideRouter(routes, withComponentInputBinding()),
+    provideHttpClient()
   ]
-}).catch(err => console.error(err));
+})
+.catch(err => console.error(err));

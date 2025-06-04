@@ -1,56 +1,56 @@
 <!-- src/app/pages/login/login.component.html -->
-
-<div class="page-wrapper">
-  <div class="card auth-card">
-    <h3 class="brand">Red Social</h3>
-    <p class="subtitle text-center mb-4">
-      Academica
-    </p>
+<div class="login-page d-flex justify-content-center">
+  <div class="card p-4 shadow-sm" style="width: 400px;">
+    <h3 class="text-center mb-4">Iniciar Sesión</h3>
 
     <form [formGroup]="form" (ngSubmit)="submit()">
-      <input
-        type="text"
-        formControlName="username"
-        class="form-control"
-        placeholder="Correo electrónico o teléfono">
-      <div
-        *ngIf="form.controls['username'].touched && form.controls['username'].invalid"
-        class="text-danger small mb-3">
-        Campo obligatorio
+      <div class="mb-3">
+        <input
+          type="text"
+          formControlName="username"
+          class="form-control form-control-lg"
+          placeholder="Correo electrónico o teléfono"
+        />
+        <div
+          *ngIf="form.controls['username'].touched && form.controls['username'].invalid"
+          class="text-danger small"
+        >
+          Campo obligatorio
+        </div>
       </div>
 
-      <input
-        type="password"
-        formControlName="password"
-        class="form-control"
-        placeholder="Contraseña">
-      <div
-        *ngIf="form.controls['password'].touched && form.controls['password'].invalid"
-        class="text-danger small mb-3">
-        Campo obligatorio
+      <div class="mb-3">
+        <input
+          type="password"
+          formControlName="password"
+          class="form-control form-control-lg"
+          placeholder="Contraseña"
+        />
+        <div
+          *ngIf="form.controls['password'].touched && form.controls['password'].invalid"
+          class="text-danger small"
+        >
+          Campo obligatorio
+        </div>
       </div>
 
       <button
         type="submit"
-        class="btn btn-primary btn-block"
-        [disabled]="form.invalid || loading">
+        class="btn btn-primary w-100 btn-lg mb-3"
+        [disabled]="form.invalid || loading"
+      >
         {{ loading ? 'Cargando…' : 'Iniciar sesión' }}
       </button>
-
-      <div class="text-center my-2">
-        <a class="small" href="#">¿Olvidaste tu contraseña?</a>
-      </div>
-
-      <div *ngIf="errorMsg" class="alert alert-danger text-center">
-        {{ errorMsg }}
-      </div>
     </form>
 
-    <hr>
+    <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+
+    <hr />
 
     <button
-      class="btn btn-success btn-block"
-      (click)="router.navigate(['/signup'])">
+      class="btn btn-success w-100 btn-lg"
+      (click)="router.navigate(['/signup'])"
+    >
       Crear nueva cuenta
     </button>
   </div>
